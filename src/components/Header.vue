@@ -1,7 +1,7 @@
 <template>
   <div class="header">
-    <a :class="route === 'Gallery' ? 'active' : ''">Gallery</a>
-    <a>Form Contact</a>
+    <router-link to="/gallery" :class="route === 'Gallery' ? 'active' : ''">Gallery</router-link>
+    <router-link to="/form-contact" :class="route === 'Form Contact' ? 'active' : ''">Form Contact</router-link>
     <a>Slider</a>
   </div>
 </template>

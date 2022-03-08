@@ -3,7 +3,7 @@
     <div class="popup">
       <div class="title">
         <h3>{{ item.title }}</h3>
-        <span @click="closePopup">x</span>
+        <span @click="$emit('update:openPopup', false)">x</span>
       </div>
       <div class="content">
         <img :src="item.src" alt="" />
@@ -15,11 +15,6 @@
 <script>
 export default {
   props: ["item", "openPopup"],
-  emits: ["openPopup"],
-  methods: {
-    closePopup() {
-      this.$emit("openPopup", false);
-    },
-  },
+  emits: ["update:openPopup"]
 }
 </script>

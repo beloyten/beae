@@ -19,6 +19,18 @@ const router = createRouter({
           component: () => import("@/views/Gallery.vue")
         }
       ]
+    },
+    {
+      path: '/form-contact',
+      component: BasicLayout,
+      meta: { title: 'Form Contact' },
+      children: [
+        {
+          name: 'Form Contact',
+          path: '',
+          component: () => import("@/views/FormContact.vue")
+        }
+      ]
     }
   ]
 })

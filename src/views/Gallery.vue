@@ -69,6 +69,7 @@
               <div class="item-actions">
                 <button @click="changeItemContent(index)">Apply</button>
                 <button @click="deleteItem(index)">Delete</button>
+                <button @click="closeItemDetail()">Cancel</button>
               </div>
             </div>
           </li>
@@ -86,7 +87,7 @@
         <img :src="item.src" alt="" />
       </div>
     </div>
-    <LightBox v-if="openPopup" :item="selectedItem" :openPopup="openPopup" />
+    <LightBox v-if="openPopup" :item="selectedItem" v-model:openPopup="openPopup" />
   </div>
 </template>
 
@@ -207,19 +208,23 @@ export default {
       this.applyCSS();
     },
     changeItemContent(index) {
-      this.items[index].title = this.itemTitle;
-      this.items[index].thumbnail = this.itemThumbnail;
-      this.items[index].src = this.itemSrc;
-      let indexChange = this.items[index].index;
-      console.log(indexChange, this.itemIndex);
-      this.items.forEach((item, i) => {
-        if (i + 1 == this.itemIndex) {
-          item.index = indexChange;
-        } else if (i == index) {
-          item.index = this.itemIndex;
-        }
-      });
-      this.closeItemDetail();
+      if (1 <= index && index <= this.items.length) {
+        this.items[index].title = this.itemTitle;
+        this.items[index].thumbnail = this.itemThumbnail;
+        this.items[index].src = this.itemSrc;
+        let indexChange = this.items[index].index;
+        console.log(indexChange, this.itemIndex);
+        this.items.forEach((item, i) => {
+          if (i + 1 == this.itemIndex) {
+            item.index = indexChange;
+          } else if (i == index) {
+            item.index = this.itemIndex;
+          }
+        });
+        this.closeItemDetail();
+      } else {
+        alert('Index value must be between 1 and the length of the array');
+      }
     },
     closeItemDetail() {
       this.selected = null;

@@ -137,15 +137,14 @@
         max-width: 100%;
       }
     }
-    .item-1 {
-    }
   }
 }
 .overlay {
   width: calc(100vw);
   height: calc(100vh);
-  position: absolute;
+  position: fixed;
   top: 0;
+  left: 0;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -159,6 +158,7 @@
       background-color: #ccc;
       padding: 10px 20px;
       span {
+        font-size: 20px;
         &:hover {
           font-weight: bold;
           cursor: pointer;
