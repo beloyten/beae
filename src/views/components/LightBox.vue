@@ -15,6 +15,5 @@
 <script>
 export default {
   props: ["item", "openPopup"],
-  emits: ["update:openPopup"]
-}
+};
 </script>

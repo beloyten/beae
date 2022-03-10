@@ -1,0 +1,224 @@
+.form-contact {
+  .left {
+    .items {
+      border: 1px solid black;
+      padding: 10px 15px;
+      .list-item-title {
+        display: flex;
+        justify-content: space-between;
+        position: relative;
+        button {
+          padding: 5px 10px;
+        }
+        .add-list {
+          position: absolute;
+          right: -45px;
+          top: 35px;
+          background-color: #cccc;
+          padding: 10px 15px;
+          border-radius: 5px;
+          border: 1px solid black;
+          opacity: 0;
+          &.show {
+            opacity: 1;
+          }
+          span {
+            float: right;
+            margin-right: -5px;
+            margin-top: -5px;
+            &:hover {
+              cursor: pointer;
+              transform: translateY(-2px);
+              font-weight: bold;
+            }
+          }
+          ul {
+            margin-top: 10px;
+            li {
+              &:hover {
+                cursor: pointer;
+                transform: translateY(-2px);
+              }
+            }
+          }
+        }
+      }
+      .item-content {
+        margin-top: 15px;
+        div {
+          margin-top: 5px;
+          margin-bottom: 10px;
+          display: flex;
+          flex-direction: column;
+          input, textarea {
+            margin-top: 5px;
+            padding: 5px 10px;
+          }
+          span {
+            margin-top: 5px;
+            font-size: 15px;
+            opacity: 0.7;
+          }
+          &.required {
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            align-items: flex-end;
+            input {
+              margin-top: 0;
+              width: 17px;
+              height: 17px;
+            }
+            label {
+              margin-left: 10px;
+            }
+          } 
+          &.options {
+            .label {
+              flex-direction: row;
+              justify-content: space-between;
+              align-items: center;
+              button {
+                padding: 5px 10px;
+              }
+            }
+            .options-content {
+              padding: 5px 10px;
+              border: 1px solid black;
+              div {
+                margin-top: 5px;
+                margin-bottom: 5px;
+                &.title-option {
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                  button {
+                    padding: 5px 10px;
+                  }
+                }
+              }
+            }
+          }
+          &.field-width {
+            width: 100%;
+            .slider {
+              width: 100%;
+              display: flex;
+              justify-content: space-between;
+              flex-direction: row;
+              input {
+                margin-top: 0;
+                width: 80%;
+                padding: 0;
+              }
+              output {
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+              }
+            }
+          }
+          &.item-actions {
+            flex-direction: row;
+            justify-content: flex-end;
+            margin-top: 15px;
+            button {
+              padding: 5px 10px;
+              margin-left: 5px;
+              margin-right: 5px;
+            }
+          }
+        }
+      }
+      .add-new {
+        border: 1px solid black;
+        padding: 5px 10px;
+        margin-top: 20px;
+        .title {
+          font-weight: bold;
+        }
+      }
+      ul {
+        margin-top: 20px;
+        li {
+          list-style: none;
+          margin-top: 10px;
+          margin-bottom: 10px;
+          &.active {
+            border: 1px solid black;
+            padding: 5px 10px;
+            .title {
+              font-weight: bold;
+            }
+          }
+          .title {
+            &:hover {
+              cursor: pointer;
+              font-weight: bold;
+              transform: translateY(-2px);
+            }
+          }
+        }
+      }
+    }
+  }
+  .right {
+    form {
+      border: 1px solid black;
+      padding: 10px;
+      .content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+        .item {
+          div {
+            display: flex;
+            flex-direction: column;
+            label {
+              margin-bottom: 10px;
+              span {
+                font-size: 14px;
+                color: red;
+              }
+            }
+            .description {
+              font-size: 15px;
+              opacity: 0.7;
+              margin-top: 5px;
+            }
+            input, textarea {
+              padding: 10px;
+            }
+            select {
+              padding: 10px;
+              height: 44px;
+              -moz-appearance:none; /* Firefox */
+              -webkit-appearance:none; /* Safari and Chrome */
+              appearance:none;
+              background-image: url("data:image/svg+xml;utf8,<svg fill='black' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+              background-repeat: no-repeat;
+              background-position-x: 100%;
+              background-position-y: 10px;
+            }
+          }
+          &.Checkbox, &.Radio {
+            .option {
+              flex-direction: row;
+              margin-bottom: 10px;
+              align-items: center;
+              label {
+                margin-bottom: 0;
+                margin-left: 10px;
+              }
+            }
+          }
+        }
+      }
+      .actions {
+        margin-top: 20px;
+        button {
+          padding: 10px 20px;
+        }
+      }
+    }
+  }
+}

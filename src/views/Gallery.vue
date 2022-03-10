@@ -1,14 +1,18 @@
 <template>
-  <div class="gallery">
+  <div class="page gallery">
     <div class="left">
       <div class="gap-column">
         <div>
-          <label>Columns: </label>
-          <input type="number" v-model="columns" />
+          <label for="item-per-row">Items per row</label>
+          <input id="item-per-row" type="number" v-model="columns" />
         </div>
         <div>
-          <label>Gap: </label>
-          <input type="number" v-model="gap" />
+          <label for="column-gap">Column gap (px)</label>
+          <input id="column-gap" type="number" v-model="columnGap" />
+        </div>
+        <div>
+          <label for="row-gap">Row gap (px)</label>
+          <input id="row-gap" type="number" v-model="rowGap" />
         </div>
         <div class="actions">
           <button @click="applyCSS">Apply</button>
@@ -24,16 +28,16 @@
           <div class="title">Add new</div>
           <div class="item-content">
             <div>
-              <label>Title: </label>
-              <input type="text" v-model="itemTitle" />
+              <label for="new-title">Title</label>
+              <input id="new-title" type="text" v-model="itemTitle" />
             </div>
             <div>
-              <label>Thumbnail: </label>
-              <input type="text" v-model="itemThumbnail" />
+              <label for="new-thumbnail">Thumbnail</label>
+              <input id="new-thumbnail" type="text" v-model="itemThumbnail" />
             </div>
             <div>
-              <label>Src: </label>
-              <input type="text" v-model="itemSrc" />
+              <label for="new-src">Src</label>
+              <input id="new-src" type="text" v-model="itemSrc" />
             </div>
             <div class="item-actions">
               <button @click="addNewItem()">Apply</button>
@@ -51,20 +55,24 @@
             </div>
             <div class="item-content" v-if="selected === index">
               <div>
-                <label>Title: </label>
-                <input type="text" v-model="itemTitle"/>
+                <label for="edit-title">Title</label>
+                <input id="edit-title" type="text" v-model="itemTitle" />
               </div>
               <div>
-                <label>Index: </label>
-                <input type="number" v-model="itemIndex"/>
+                <label for="edit-index">Index</label>
+                <input id="edit-index" type="number" v-model="itemIndex" />
               </div>
               <div>
-                <label>Thumbnail: </label>
-                <input type="text" v-model="itemThumbnail"/>
+                <label for="edit-thumbnail">Thumbnail</label>
+                <input
+                  id="edit-thumbnail"
+                  type="text"
+                  v-model="itemThumbnail"
+                />
               </div>
               <div>
-                <label>Src: </label>
-                <input type="text" v-model="itemSrc"/>
+                <label for="edit-src">Src</label>
+                <input id="edit-src" type="text" v-model="itemSrc" />
               </div>
               <div class="item-actions">
                 <button @click="changeItemContent(index)">Apply</button>
@@ -87,7 +95,11 @@
         <img :src="item.src" alt="" />
       </div>
     </div>
-    <LightBox v-if="openPopup" :item="selectedItem" v-model:openPopup="openPopup" />
+    <LightBox
+      v-if="openPopup"
+      :item="selectedItem"
+      v-model:openPopup="openPopup"
+    />
   </div>
 </template>
 
@@ -96,7 +108,7 @@ import LightBox from "./components/LightBox.vue";
 
 export default {
   components: {
-    LightBox
+    LightBox,
   },
   data() {
     return {
@@ -156,10 +168,11 @@ export default {
           thumbnail:
             "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
           index: 8,
-        }
+        },
       ],
       columns: 4,
-      gap: 50,
+      rowGap: 50,
+      columnGap: 50,
       itemTitle: "",
       itemThumbnail: "",
       itemSrc: "",
@@ -188,6 +201,7 @@ export default {
   methods: {
     select(index) {
       if (this.selected !== index) {
+        this.cancelAdd();
         this.selected = index;
         this.itemTitle = this.sortItems[index].title;
         this.itemThumbnail = this.sortItems[index].thumbnail;
@@ -199,8 +213,9 @@ export default {
     },
     applyCSS() {
       let gridContent = document.getElementById("grid-content");
-      gridContent.style.gridTemplateColumns = "repeat(" + this.columns + ", 1fr)";
-      gridContent.style.gap = this.gap + "px";
+      gridContent.style.gridTemplateColumns =
+        "repeat(" + this.columns + ", 1fr)";
+      gridContent.style.gap = this.rowGap + "px " + this.columnGap + "px";
     },
     resetCSS() {
       this.columns = 4;
@@ -213,7 +228,6 @@ export default {
         this.items[index].thumbnail = this.itemThumbnail;
         this.items[index].src = this.itemSrc;
         let indexChange = this.items[index].index;
-        console.log(indexChange, this.itemIndex);
         this.items.forEach((item, i) => {
           if (i + 1 == this.itemIndex) {
             item.index = indexChange;
@@ -223,7 +237,7 @@ export default {
         });
         this.closeItemDetail();
       } else {
-        alert('Index value must be between 1 and the length of the array');
+        alert("Index value must be between 1 and the length of the array");
       }
     },
     closeItemDetail() {
@@ -234,6 +248,7 @@ export default {
       this.itemIndex = 0;
     },
     openFormAdd() {
+      this.closeItemDetail();
       this.checkAddNew = true;
     },
     cancelAdd() {
@@ -246,7 +261,7 @@ export default {
         title: this.itemTitle,
         thumbnail: this.itemThumbnail,
         index: this.items.length + 1,
-      })
+      });
       this.cancelAdd();
     },
     deleteItem(index) {

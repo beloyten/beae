@@ -10,9 +10,12 @@
   },
   "dependencies": {
     "vue": "^3.2.31",
-    "vue-router": "^4.0.12"
+    "vue-router": "^4.0.12",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
+    "@babel/eslint-parser": "^7.17.0",
+    "@babel/eslint-plugin": "^7.16.5",
     "@rushstack/eslint-patch": "^1.1.0",
     "@types/node": "^16.11.25",
     "@vitejs/plugin-vue": "^2.2.2",
