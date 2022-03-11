@@ -112,64 +112,6 @@ export default {
   },
   data() {
     return {
-      items: [
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 01",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 1,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 02",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 2,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 03",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 3,
-        },
-        {
-          src: "https://hinhnen123.com/wp-content/uploads/2021/06/hinh-nen-dep.jpg",
-          title: "anh 04",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 4,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 05",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 5,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 06",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 6,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 07",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 7,
-        },
-        {
-          src: "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          title: "anh 08",
-          thumbnail:
-            "https://i.pinimg.com/564x/62/ed/6e/62ed6ea71018a57a3ab0c8c959d78cb0.jpg",
-          index: 8,
-        },
-      ],
       columns: 4,
       rowGap: 50,
       columnGap: 50,
@@ -185,7 +127,7 @@ export default {
   },
   computed: {
     sortItems() {
-      let newArrays = Object.assign([], this.items);
+      let newArrays = Object.assign([], this.listGallery);
       for (let i = 0; i < newArrays.length - 1; i++) {
         for (let j = i + 1; j < newArrays.length; j++) {
           if (newArrays[i].index > newArrays[j].index) {
@@ -196,6 +138,9 @@ export default {
         }
       }
       return newArrays;
+    },
+    listGallery() {
+      return this.$store.getters.galleryItems;
     },
   },
   methods: {
@@ -212,10 +157,16 @@ export default {
       }
     },
     applyCSS() {
-      let gridContent = document.getElementById("grid-content");
-      gridContent.style.gridTemplateColumns =
-        "repeat(" + this.columns + ", 1fr)";
-      gridContent.style.gap = this.rowGap + "px " + this.columnGap + "px";
+      if (this.columns < 1) {
+        alert("The columns field must be >= 1!");
+      } else if (this.columnGap < 0 || this.rowGap < 0) {
+        alert("The gap values must be >= 0!");
+      } else {
+        let gridContent = document.getElementById("grid-content");
+        gridContent.style.gridTemplateColumns =
+          "repeat(" + this.columns + ", 1fr)";
+        gridContent.style.gap = this.rowGap + "px " + this.columnGap + "px";
+      }
     },
     resetCSS() {
       this.columns = 4;

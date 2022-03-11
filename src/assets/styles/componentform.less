@@ -1,0 +1,74 @@
+.component-form {
+  .left {
+    .items {
+      border: 1px solid black;
+      padding: 10px 15px;
+      .list-item-title {
+        font-size: 17px;
+        ul {
+          display: flex;
+          li {
+            list-style: none;
+            width: 50%;
+            text-align: center;
+            border-radius: 3px;
+            position: relative;
+            padding: 5px;
+            &::before {
+              content: '';
+              position: absolute;
+              width: 0;
+              height: 3px;
+              background-color: green;
+              border-radius: 2px;
+              bottom: -7px;
+              left: 0;
+            }
+            &:hover {
+              cursor: pointer;
+              background-color: #000000;
+              &::before {
+                width: 100%;
+                -webkit-transition: all 0.5s ease-in-out;
+                -moz-transition: all 0.5s ease-in-out;
+                -o-transition: all 0.5s ease-in-out;
+                transition: all 0.5s ease-in-out;
+              }
+            }
+            &.active {
+              background-color: #000000;
+              &::before {
+                width: 100%;
+              }
+            }
+          }
+        }
+      }
+      .item-content {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+        border: 1px solid black;
+        padding: 10px;
+        margin-top: 20px;
+        .button {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          border: 1px solid black;
+          padding: 10px;
+          &:hover {
+            cursor: pointer;
+            background-color: #000000;
+          }
+        }
+      }
+    }
+  }
+  .right {
+    border: 1px solid black;
+    padding: 10px;
+  }
+}

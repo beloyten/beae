@@ -1,16 +1,57 @@
-.gallery {
+.swiper {
+  width: 100%;
+  padding-top: 50px;
+  padding-bottom: 50px;
+  .swiper-wrapper {
+    width: 100%;
+  }
+}
+
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+  position: relative;
+  .slider-item {
+    .content {
+      position: absolute;
+      bottom: 10%;
+      width: 100%;
+      text-align: center;
+      padding-left: 5%;
+      padding-right: 5%;
+      h3 {
+        font-size: 20px;
+        color: green;
+      }
+      p {
+        font-size: 12px;
+        color: white;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+}
+
+.swiper-slider {
   .left {
-    .gap-column {
+    .config-swiper {
       border: 1px solid black;
       padding: 5px 15px;
       width: 100%;
+      margin-bottom: 20px;
       div {
         margin-top: 10px;
         margin-bottom: 10px;
         width: 100%;
         display: flex;
         justify-content: center;
-        flex-direction: column;
+        align-items: center;
         label {
           width: 100%;
           margin-bottom: 10px;
@@ -20,7 +61,6 @@
           padding: 5px 10px;
         }
         &.actions {
-          flex-direction: row;
           justify-content: flex-end;
           button {
             padding: 5px 10px;
@@ -28,16 +68,30 @@
             margin-right: 5px;
           }
         }
+        &.input-checkbox {
+          div {
+            margin-top: 0;
+            margin-bottom: 0;
+            justify-content: flex-start;
+            label {
+              margin-bottom: 0;
+              margin-left: 10px;
+            }
+            input {
+              padding: 0;
+              width: 17px;
+              height: 17px;
+            }
+          }
+        }
       }
     }
     .items {
       border: 1px solid black;
       padding: 10px 15px;
-      margin-top: 20px;
       .list-item-title {
         display: flex;
         justify-content: space-between;
-        align-items: center;
         h4 {
           font-size: 20px;
         }
@@ -101,57 +155,9 @@
     }
   }
   .right {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 50px;
-    border: 1px solid black;
-    padding: 10px;
-    .item {
-      &:hover {
-        cursor: pointer;
-        transform: translateY(-2px);
-      }
-      img {
-        max-width: 100%;
-      }
-    }
-  }
-}
-.overlay {
-  width: calc(100vw);
-  height: calc(100vh);
-  position: fixed;
-  top: 0;
-  left: 0;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(0, 0, 0, 0.7);
-  .popup {
-    width: 70%;
-    height: calc(80vh);
-    .title {
-      display: flex;
-      justify-content: space-between;
-      background-color: #ccc;
-      padding: 10px 20px;
-      span {
-        font-size: 20px;
-        &:hover {
-          font-weight: bold;
-          cursor: pointer;
-        }
-      }
-    }
-    .content {
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      background-color: #fff;
-      img {
-        height: 100%;
-        object-fit: cover;
-      }
+    .mySwiper {
+      border: 1px solid black;
+      padding: 10px;
     }
   }
 }

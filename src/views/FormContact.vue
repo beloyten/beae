@@ -201,7 +201,7 @@
       </div>
     </div>
     <div class="right">
-      <form>
+      <form @submit="onSubmit">
         <div class="content" id="form-content">
           <div
             class="item"
@@ -218,6 +218,8 @@
                 :id="'field-item-' + index"
                 :placeholder="item.placeholder"
                 :type="item.type.toLowerCase()"
+                :required="item.required"
+                v-model="item.value"
               />
               <span class="description">{{ item.description }}</span>
             </div>
@@ -228,6 +230,8 @@
               <textarea
                 :id="'field-item-' + index"
                 :placeholder="item.placeholder"
+                :required="item.required"
+                v-model="item.value"
               />
               <span class="description">{{ item.description }}</span>
             </div>
@@ -239,6 +243,8 @@
                 type="datetime-local"
                 :id="'field-item-' + index"
                 :placeholder="item.placeholder"
+                :required="item.required"
+                v-model="item.value"
               />
               <span class="description">{{ item.description }}</span>
             </div>
@@ -246,7 +252,11 @@
               <label :for="'field-item-' + index"
                 >{{ item.label }} <span v-if="item.required">*</span></label
               >
-              <select :id="'field-item-' + index">
+              <select
+                :id="'field-item-' + index"
+                :required="item.required"
+                v-model="item.value"
+              >
                 <option
                   v-for="(i, index) in item.options"
                   :key="index"
@@ -270,6 +280,7 @@
                   type="checkbox"
                   :id="'checkbox-' + position"
                   :value="i.value"
+                  @change="selectOptions($event, index)"
                 />
                 <label :for="'checkbox-' + position">{{ i.text }}</label>
               </div>
@@ -289,7 +300,8 @@
                   :id="'radio-' + position"
                   :value="i.value"
                   :name="'radio-' + index"
-                  required
+                  :required="item.required"
+                  @change="selectOptions($event, index)"
                 />
                 <label :for="'radio-' + position">{{ i.text }}</label>
               </div>
@@ -298,7 +310,7 @@
           </div>
         </div>
         <div class="actions">
-          <button>Send message</button>
+          <input type="submit" class="btn" value="Send message" />
         </div>
       </form>
     </div>
@@ -316,6 +328,7 @@ export default {
           required: true,
           width: 50,
           type: "Text",
+          value: "",
         },
         {
           label: "Your Email",
@@ -324,6 +337,7 @@ export default {
           required: true,
           width: 50,
           type: "Email",
+          value: "",
         },
         {
           label: "Time",
@@ -331,6 +345,7 @@ export default {
           required: true,
           width: 50,
           type: "Datetime",
+          value: "",
         },
         {
           label: "Select",
@@ -348,6 +363,7 @@ export default {
               value: "The value 2",
             },
           ],
+          value: "",
         },
         {
           label: "Checkbox",
@@ -365,6 +381,7 @@ export default {
               value: "The value 2",
             },
           ],
+          listSelected: [],
         },
         {
           label: "Radio",
@@ -382,6 +399,7 @@ export default {
               value: "The value 2",
             },
           ],
+          listSelected: [],
         },
         {
           label: "Your message",
@@ -390,6 +408,7 @@ export default {
           required: true,
           width: 100,
           type: "Long Text",
+          value: "",
         },
       ],
       form: {
@@ -490,6 +509,11 @@ export default {
     addNewItem() {
       this.form.type = this.createType;
       this.form.width = document.getElementById("form-width").value;
+      if (this.createType === "Checkbox" || this.createType === "Radio") {
+        this.form.listSelected = [];
+      } else {
+        this.form.value = "";
+      }
       this.fields.push(this.form);
       console.log(this.fields);
       this.closeAdd();
@@ -516,6 +540,67 @@ export default {
         element.gridColumn = "auto";
         element.width = width * 2 + "%";
       }
+    },
+    onSubmit(e) {
+      e.preventDefault();
+      let check = true;
+      this.fields.forEach((item) => {
+        if (item.type === "Checkbox" && item.required) {
+          if (
+            !item.listSelected ||
+            (item.listSelected && item.listSelected.length === 0)
+          ) {
+            console.log(item);
+            check = false;
+            alert("Please input required Checkbox!");
+            return;
+          }
+        }
+      });
+      if (check) {
+        this.showSuccessMsg();
+      }
+    },
+    selectOptions(e, index) {
+      if (!this.fields[index].listSelected) {
+        this.fields[index].listSelected = [];
+        this.fields[index].listSelected.push(e.target.value);
+      } else {
+        let i = -1;
+        this.fields[index].listSelected.forEach((item, position) => {
+          if (item === e.target.value) {
+            i = position;
+          }
+        });
+        if (i !== -1) {
+          this.fields[index].listSelected.splice(i, 1);
+        } else {
+          this.fields[index].listSelected.push(e.target.value);
+        }
+      }
+    },
+    showSuccessMsg() {
+      let message = "Submit successful!\n";
+      this.fields.forEach((item) => {
+        if (item.type === "Checkbox" || item.type === "Radio") {
+          message +=
+            item.label + ": " + this.arrayToString(item.listSelected) + "\n";
+        } else {
+          message += item.label + ": " + item.value + "\n";
+        }
+      });
+      alert(message);
+    },
+    arrayToString(array) {
+      let string = "[ ";
+      Object.keys(array).forEach((item, index) => {
+        string += array[item];
+        if (index !== Object.keys(array).length - 1) {
+          string += ", ";
+        }
+      });
+      string += " ]";
+      return string;
     },
   },
   mounted() {
