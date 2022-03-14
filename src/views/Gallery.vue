@@ -140,7 +140,7 @@ export default {
       return newArrays;
     },
     listGallery() {
-      return this.$store.getters.galleryItems;
+      return this.$store.getters.galleryListItems;
     },
   },
   methods: {
