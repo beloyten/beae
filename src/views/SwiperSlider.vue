@@ -153,53 +153,6 @@ export default {
   },
   data() {
     return {
-      slides: [
-        {
-          img: "https://swiperjs.com/demos/images/nature-1.jpg",
-          title: "The Title 1",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-2.jpg",
-          title: "The Title 2",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-3.jpg",
-          title: "The Title 3",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-4.jpg",
-          title: "The Title 4",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-5.jpg",
-          title: "The Title 5",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-6.jpg",
-          title: "The Title 6",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-7.jpg",
-          title: "The Title 7",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-8.jpg",
-          title: "The Title 8",
-          content: "Content",
-        },
-        {
-          img: "https://swiperjs.com/demos/images/nature-9.jpg",
-          title: "The Title 9",
-          content: "Content",
-        },
-      ],
       checkAddNew: false,
       itemTitle: "",
       itemContent: "",
@@ -214,6 +167,19 @@ export default {
       modules: [EffectCoverflow, Pagination, Navigation],
     };
   },
+  computed: {
+    slides() {
+      return this.$store.getters.getSwiperSliderList;
+    },
+    swiperSliderOptions() {
+      return this.$store.getters.getSwiperSliderOptions;
+    },
+  },
+  created() {
+    this.itemPerPageConfig = this.swiperSliderOptions.itemsPerPage;
+    this.paginationConfig = this.swiperSliderOptions.pagination;
+    this.navigationConfig = this.swiperSliderOptions.navigation;
+  },
   methods: {
     openFormAdd() {
       this.closeItemDetail();
@@ -226,10 +192,10 @@ export default {
       this.itemImg = "";
     },
     addNewItem() {
-      this.slides.push({
+      this.$store.commit("addNewSwiperSlider", {
         img: this.itemImg,
         title: this.itemTitle,
-        content: this.itemContent
+        content: this.itemContent,
       });
       this.cancelAdd();
     },
@@ -249,25 +215,32 @@ export default {
       }
     },
     changeItemContent(index) {
-      this.slides[index].title = this.itemTitle;
-      this.slides[index].content = this.itemContent;
-      this.slides[index].img = this.itemImg;
+      this.$store.commit("changeSwiperSliderItemContent", {
+        index: index,
+        item: {
+          title: this.itemTitle,
+          content: this.itemContent,
+          img: this.itemImg,
+        },
+      });
       this.closeItemDetail();
     },
     deleteItem(index) {
-      this.slides.splice(index, 1);
+      this.$store.commit("deleteSwiperSlider", index);
       this.closeItemDetail();
     },
     applyConfig() {
       if (this.itemPerPage < 1 || this.itemPerPage > this.slides.length) {
         alert("You must input item per page >= 1 and <=" + this.slides.length);
-        this.itemPerPage = 3;
-        this.pagination = true;
-        this.navigation = true;
       } else {
         this.itemPerPageConfig = this.itemPerPage;
         this.paginationConfig = this.pagination;
         this.navigationConfig = this.navigation;
+        this.$store.commit("setSwiperSliderOptions", {
+          itemsPerPage: this.itemPerPage,
+          pagination: this.pagination,
+          navigation: this.navigation,
+        });
       }
     },
     resetConfig() {

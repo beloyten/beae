@@ -33,8 +33,5 @@ export default {
       return this.$route.name;
     },
   },
-  created() {
-    console.log(this.route);
-  },
 };
 </script>

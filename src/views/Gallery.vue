@@ -133,15 +133,23 @@ export default {
           if (newArrays[i].index > newArrays[j].index) {
             let temp = newArrays[i];
             newArrays[i] = newArrays[j];
-            newArrays[j]=temp;
+            newArrays[j] = temp;
           }
         }
       }
       return newArrays;
     },
     listGallery() {
-      return this.$store.getters.galleryListItems;
+      return this.$store.getters.getGalleryListItems;
     },
+    galleryOptions() {
+      return this.$store.getters.getGalleryOptions;
+    },
+  },
+  created() {
+    this.columns = this.galleryOptions.columns;
+    this.rowGap = this.galleryOptions.rowGap;
+    this.columnGap = this.galleryOptions.columnGap;
   },
   methods: {
     select(index) {
@@ -166,6 +174,11 @@ export default {
         gridContent.style.gridTemplateColumns =
           "repeat(" + this.columns + ", 1fr)";
         gridContent.style.gap = this.rowGap + "px " + this.columnGap + "px";
+        this.$store.commit("setGalleryOptions", {
+          columns: this.columns,
+          rowGap: this.rowGap,
+          columnGap: this.columnGap,
+        });
       }
     },
     resetCSS() {
@@ -174,17 +187,16 @@ export default {
       this.applyCSS();
     },
     changeItemContent(index) {
-      if (1 <= index && index <= this.items.length) {
-        this.items[index].title = this.itemTitle;
-        this.items[index].thumbnail = this.itemThumbnail;
-        this.items[index].src = this.itemSrc;
-        let indexChange = this.items[index].index;
-        this.items.forEach((item, i) => {
-          if (i + 1 == this.itemIndex) {
-            item.index = indexChange;
-          } else if (i == index) {
-            item.index = this.itemIndex;
-          }
+      if (this.itemIndex >= 1 && this.itemIndex <= this.listGallery.length) {
+        this.$store.commit("changeGalleryItemContent", {
+          index: index,
+          itemIndex: this.itemIndex,
+          gallery: {
+            title: this.itemTitle,
+            thumbnail: this.itemThumbnail,
+            src: this.itemSrc,
+            index: this.itemIndex,
+          },
         });
         this.closeItemDetail();
       } else {
@@ -207,16 +219,16 @@ export default {
       this.checkAddNew = false;
     },
     addNewItem() {
-      this.items.push({
+      this.$store.commit("addGalleryItem", {
         src: this.itemSrc,
         title: this.itemTitle,
         thumbnail: this.itemThumbnail,
-        index: this.items.length + 1,
+        index: this.listGallery.length + 1,
       });
       this.cancelAdd();
     },
     deleteItem(index) {
-      this.items.splice(index, 1);
+      this.$store.commit("deleteGalleryItem", index);
       this.closeItemDetail();
     },
     openImage(item) {

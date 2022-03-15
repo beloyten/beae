@@ -278,11 +278,13 @@
               >
                 <input
                   type="checkbox"
-                  :id="'checkbox-' + position"
+                  :id="'checkbox-' + index + '' + position"
                   :value="i.value"
                   @change="selectOptions($event, index)"
                 />
-                <label :for="'checkbox-' + position">{{ i.text }}</label>
+                <label :for="'checkbox-' + index + '' + position">{{
+                  i.text
+                }}</label>
               </div>
               <span class="description">{{ item.description }}</span>
             </div>
@@ -297,13 +299,15 @@
               >
                 <input
                   type="radio"
-                  :id="'radio-' + position"
+                  :id="'radio-' + index + '' + position"
                   :value="i.value"
                   :name="'radio-' + index"
                   :required="item.required"
                   @change="selectOptions($event, index)"
                 />
-                <label :for="'radio-' + position">{{ i.text }}</label>
+                <label :for="'radio-' + index + '' + position">{{
+                  i.text
+                }}</label>
               </div>
               <span class="description">{{ item.description }}</span>
             </div>
@@ -320,97 +324,6 @@
 export default {
   data() {
     return {
-      fields: [
-        {
-          label: "Your name",
-          placeholder: "Your name",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Text",
-          value: "",
-        },
-        {
-          label: "Your Email",
-          placeholder: "Email",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Email",
-          value: "",
-        },
-        {
-          label: "Time",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Datetime",
-          value: "",
-        },
-        {
-          label: "Select",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Select",
-          options: [
-            {
-              text: "The Title 1",
-              value: "The value 1",
-            },
-            {
-              text: "The Title 2",
-              value: "The value 2",
-            },
-          ],
-          value: "",
-        },
-        {
-          label: "Checkbox",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Checkbox",
-          options: [
-            {
-              text: "The Title 1",
-              value: "The value 1",
-            },
-            {
-              text: "The Title 2",
-              value: "The value 2",
-            },
-          ],
-          listSelected: [],
-        },
-        {
-          label: "Radio",
-          description: "",
-          required: true,
-          width: 50,
-          type: "Radio",
-          options: [
-            {
-              text: "The Title 1",
-              value: "The value 1",
-            },
-            {
-              text: "The Title 2",
-              value: "The value 2",
-            },
-          ],
-          listSelected: [],
-        },
-        {
-          label: "Your message",
-          placeholder: "Your message",
-          description: "",
-          required: true,
-          width: 100,
-          type: "Long Text",
-          value: "",
-        },
-      ],
       form: {
         label: "",
         description: "",
@@ -428,6 +341,11 @@ export default {
       showAddList: false,
       createType: null,
     };
+  },
+  computed: {
+    fields() {
+      return this.$store.getters.getFormContactList;
+    },
   },
   methods: {
     select(index) {
@@ -514,19 +432,19 @@ export default {
       } else {
         this.form.value = "";
       }
-      this.fields.push(this.form);
-      console.log(this.fields);
+      this.$store.commit("addFormContactItem", this.form);
       this.closeAdd();
     },
     changeItemContent(index) {
-      this.fields[index] = this.formEdit;
-      this.fields[index].width = document.getElementById(
-        "edit-width-" + index
-      ).value;
+      this.$store.commit("changeFormContactItemContent", {
+        index: index,
+        formEdit: this.formEdit,
+        width: document.getElementById("edit-width-" + index).value,
+      });
       this.closeItemDetail();
     },
     deleteItem(index) {
-      this.fields.splice(index, 1);
+      this.$store.commit("deleteFormContactItem", index);
     },
     onUpdateWidth(e) {
       let width = e.target.value;
@@ -550,7 +468,6 @@ export default {
             !item.listSelected ||
             (item.listSelected && item.listSelected.length === 0)
           ) {
-            console.log(item);
             check = false;
             alert("Please input required Checkbox!");
             return;
@@ -562,22 +479,10 @@ export default {
       }
     },
     selectOptions(e, index) {
-      if (!this.fields[index].listSelected) {
-        this.fields[index].listSelected = [];
-        this.fields[index].listSelected.push(e.target.value);
-      } else {
-        let i = -1;
-        this.fields[index].listSelected.forEach((item, position) => {
-          if (item === e.target.value) {
-            i = position;
-          }
-        });
-        if (i !== -1) {
-          this.fields[index].listSelected.splice(i, 1);
-        } else {
-          this.fields[index].listSelected.push(e.target.value);
-        }
-      }
+      this.$store.commit("selecOptionFormContact", {
+        index: index,
+        value: e.target.value,
+      });
     },
     showSuccessMsg() {
       let message = "Submit successful!\n";
@@ -602,18 +507,6 @@ export default {
       string += " ]";
       return string;
     },
-  },
-  mounted() {
-    this.fields.forEach((item, index) => {
-      let element = document.getElementById("item-" + index).style;
-      if (item.width > 50) {
-        element.gridColumn = "1/3";
-        element.width = item.width + "%";
-      } else {
-        element.gridColumn = "auto";
-        element.width = item.width * 2 + "%";
-      }
-    });
   },
 };
 </script>
