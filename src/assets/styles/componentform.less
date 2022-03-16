@@ -19,14 +19,15 @@
               position: absolute;
               width: 0;
               height: 3px;
-              background-color: green;
+              background-color: #6373ff;
               border-radius: 2px;
               bottom: -7px;
               left: 0;
             }
             &:hover {
               cursor: pointer;
-              background-color: #000000;
+              background-color: #6373ff;
+              color: white;
               &::before {
                 width: 100%;
                 -webkit-transition: all 0.5s ease-in-out;
@@ -36,7 +37,8 @@
               }
             }
             &.active {
-              background-color: #000000;
+              background-color: #6373ff;
+              color: white;
               &::before {
                 width: 100%;
               }
@@ -61,7 +63,8 @@
           padding: 10px;
           &:hover {
             cursor: pointer;
-            background-color: #000000;
+            background-color: #6373ff;
+            color: white;
           }
         }
       }
@@ -121,11 +124,44 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
             h4 {
               font-size: 17px;
             }
             button {
               padding: 5px 10px;
+            }
+            .add-list {
+              position: absolute;
+              right: -45px;
+              top: 35px;
+              background-color: #cccc;
+              padding: 10px 15px;
+              border-radius: 5px;
+              border: 1px solid black;
+              opacity: 0;
+              &.show {
+                opacity: 1;
+              }
+              span {
+                float: right;
+                margin-right: -5px;
+                margin-top: -5px;
+                &:hover {
+                  cursor: pointer;
+                  transform: translateY(-2px);
+                  font-weight: bold;
+                }
+              }
+              ul {
+                margin-top: 10px;
+                li {
+                  &:hover {
+                    cursor: pointer;
+                    transform: translateY(-2px);
+                  }
+                }
+              }
             }
           }
           .item-content {
@@ -135,9 +171,14 @@
               margin-bottom: 5px;
               display: flex;
               flex-direction: column;
-              input {
+              input, textarea {
                 margin-top: 5px;
                 padding: 5px 10px;
+              }
+              span {
+                margin-top: 5px;
+                font-size: 15px;
+                opacity: 0.7;
               }
               &.item-actions {
                 flex-direction: row;
@@ -147,6 +188,69 @@
                   padding: 5px 10px;
                   margin-left: 5px;
                   margin-right: 5px;
+                }
+              }
+              &.required {
+                flex-direction: row-reverse;
+                justify-content: flex-end;
+                align-items: flex-end;
+                margin-top: 15px;
+                input {
+                  margin-top: 0;
+                  width: 17px;
+                  height: 17px;
+                }
+                label {
+                  margin-left: 10px;
+                }
+              } 
+              &.options-list {
+                margin-top: 10px;
+                padding: 10px;
+                border: 1px solid black;
+                .label {
+                  flex-direction: row;
+                  justify-content: space-between;
+                  align-items: center;
+                  button {
+                    padding: 5px 10px;
+                  }
+                }
+                .options-content {
+                  padding: 5px 10px;
+                  border: 1px solid black;
+                  div {
+                    margin-top: 5px;
+                    margin-bottom: 5px;
+                    &.title-option {
+                      flex-direction: row;
+                      justify-content: space-between;
+                      align-items: center;
+                      button {
+                        padding: 5px 10px;
+                      }
+                    }
+                  }
+                }
+              }
+              &.field-width {
+                width: 100%;
+                margin-top: 20px;
+                .slider {
+                  width: 100%;
+                  display: flex;
+                  justify-content: space-between;
+                  flex-direction: row;
+                  input {
+                    margin-top: 0;
+                    width: 80%;
+                    padding: 0;
+                  }
+                  output {
+                    font-size: 14px;
+                    display: flex;
+                    align-items: center;
+                  }
                 }
               }
             }
@@ -193,11 +297,11 @@
       border: 1px solid black;
       padding: 10px;
       &.active {
-        border-color: green;
+        border-color: #6373ff;
       }
       &:hover {
         cursor: pointer;
-        border-color: green;
+        border-color: #6373ff;
       }
       .gallery-component {
         display: grid;
