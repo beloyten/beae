@@ -124,6 +124,90 @@ const store = createStore({
     addComponentFormItem(state: any, item: any) {
       state.componentFormListItems.push(item);
     },
+    deleteComponentFormItem(state: any, index: number) {
+      state.componentFormListItems.splice(index, 1);
+    },
+    setComponentFormItemOptions(state: any, data: any) {
+      state.componentFormListItems[data.index].fields.options = data.options;
+    },
+    addListItemComponentForm(state: any, data: any) {
+      state.componentFormListItems[data.index].fields.list.push(data.item);
+    },
+    deleteListItemComponentForm(state: any, data: any) {
+      state.componentFormListItems[data.index].fields.list.splice(
+        data.itemIndex,
+        1
+      );
+    },
+    changeListItemComponentForm(state: any, data: any) {
+      if (state.componentFormListItems[data.index].type === "gallery") {
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].title = data.data.title;
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].thumbnail = data.data.thumbnail;
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].src = data.data.src;
+        const indexChange =
+          state.componentFormListItems[data.index].fields.list[data.itemIndex]
+            .index;
+        state.componentFormListItems[data.index].fields.list.forEach((item: any, i: number) => {
+            if (i + 1 === data.data.index) {
+              item.index = indexChange;
+            } else if (i == data.itemIndex) {
+              item.index = data.data.index;
+            }
+          }
+        );
+      } else if (
+        state.componentFormListItems[data.index].type === "form-contact"
+      ) {
+        state.componentFormListItems[data.index].fields.list[data.itemIndex] =
+          data.data;
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].width = data.width;
+      } else if (
+        state.componentFormListItems[data.index].type === "swiper-slider"
+      ) {
+        state.componentFormListItems[data.index].fields.list[data.itemIndex] =
+          data.data;
+      }
+    },
+    selecOptionFormContactComponentForm(state: any, data: any) {
+      console.log(data);
+      if (
+        !state.componentFormListItems[data.index].fields.list[data.itemIndex]
+          .listSelected
+      ) {
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].listSelected = [];
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].listSelected.push(data.value);
+      } else {
+        let i = -1;
+        state.componentFormListItems[data.index].fields.list[
+          data.itemIndex
+        ].listSelected.forEach((item: any, position: number) => {
+          if (item === data.value) {
+            i = position;
+          }
+        });
+        if (i !== -1) {
+          state.omponentFormListItems[data.index].fields.list[
+            data.itemIndex
+          ].listSelected.splice(i, 1);
+        } else {
+          state.componentFormListItems[data.index].fields.list[
+            data.itemIndex
+          ].listSelected.push(data.value);
+        }
+      }
+    },
   },
 });
 

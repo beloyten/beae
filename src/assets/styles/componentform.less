@@ -296,6 +296,21 @@
       margin-bottom: 10px;
       border: 1px solid black;
       padding: 10px;
+      position: relative;
+      span.delete-component {
+        position: absolute;
+        right: -10px;
+        top: -10px;
+        border: 1px solid black;
+        padding: 1px 5px;
+        font-size: 12px;
+        border-radius: 50%;
+        background-color: #cccccc;
+        &:hover {
+          cursor: pointer;
+          transform: translateY(-1px);
+        }
+      }
       &.active {
         border-color: #6373ff;
       }
@@ -375,6 +390,21 @@
               padding: 10px 20px;
             }
           }
+        }
+      }
+      .text-component {
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        input {
+          padding: 5px 10px;
+          margin-top: 5px;
+          width: 50%;
+        }
+        span {
+          margin-top: 5px;
+          opacity: 0.7;
+          font-size: 12px;
         }
       }
     }

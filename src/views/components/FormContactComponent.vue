@@ -1,12 +1,12 @@
 <template>
   <div class="form-contact-component">
-    <form @submit="onSubmit">
+    <form @submit.prevent="onSubmit">
       <div class="content" id="form-content">
         <div
           class="item"
           :class="item.type"
           :id="'item-' + index"
-          v-for="(item, index) in fields"
+          v-for="(item, index) in list"
           :key="index"
         >
           <div v-if="item.type === 'Text' || item.type === 'Email'">
@@ -123,18 +123,62 @@
 export default {
   props: ["fields"],
   data() {
-    return {};
+    return {
+      list: [],
+    };
   },
   methods: {
     onSubmit() {
-      console.log("submit");
+      let check = true;
+      this.list.forEach((item) => {
+        if (item.type === "Checkbox" && item.required) {
+          if (
+            !item.listSelected ||
+            (item.listSelected && item.listSelected.length === 0)
+          ) {
+            check = false;
+            alert("Please input required Checkbox!");
+            return;
+          }
+        }
+      });
+      if (check) {
+        this.showSuccessMsg();
+      }
+    },
+    showSuccessMsg() {
+      let message = "Submit successful!\n";
+      this.list.forEach((item) => {
+        if (item.type === "Checkbox" || item.type === "Radio") {
+          message +=
+            item.label + ": " + this.arrayToString(item.listSelected) + "\n";
+        } else {
+          message += item.label + ": " + item.value + "\n";
+        }
+      });
+      alert(message);
+    },
+    arrayToString(array) {
+      let string = "[ ";
+      Object.keys(array).forEach((item, index) => {
+        string += array[item];
+        if (index !== Object.keys(array).length - 1) {
+          string += ", ";
+        }
+      });
+      string += " ]";
+      return string;
     },
     selectOptions(e, index) {
-      console.log(e, index);
+      this.$store.commit("selecOptionFormContactComponentForm", {
+        index: this.fields.index - 1,
+        itemIndex: index,
+        value: e.target.value,
+      });
     },
   },
   mounted() {
-    this.fields.forEach((item, index) => {
+    this.fields.fields.list.forEach((item, index) => {
       let element = document.getElementById("item-" + index).style;
       if (item.width > 50) {
         element.gridColumn = "1/3";
@@ -144,6 +188,9 @@ export default {
         element.width = item.width * 2 + "%";
       }
     });
+  },
+  created() {
+    this.list = Object.assign([], this.fields.fields.list);
   },
 };
 </script>
