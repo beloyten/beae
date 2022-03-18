@@ -1,6 +1,12 @@
+import { Field } from "./field";
+
 export interface Gallery {
-  src: string;
-  title: string;
-  thumbnail: string;
+  children?: Array<Field>;
+  options: {
+    src: string;
+    title: string;
+    thumbnail: string;
+  };
+  type: string;
   index: number;
 }

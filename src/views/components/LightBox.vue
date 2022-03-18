@@ -2,11 +2,11 @@
   <div class="overlay">
     <div class="popup">
       <div class="title">
-        <h3>{{ item.title }}</h3>
+        <h3>{{ item.options.title }}</h3>
         <span @click="$emit('update:openPopup', false)">x</span>
       </div>
       <div class="content">
-        <img :src="item.src" alt="" />
+        <img :src="item.options.src" alt="" />
       </div>
     </div>
   </div>

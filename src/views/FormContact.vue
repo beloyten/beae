@@ -207,73 +207,81 @@
             class="item"
             :class="item.type"
             :id="'item-' + index"
-            v-for="(item, index) in fields"
+            :style="
+              item.options.width > 50
+                ? '--width: ' + item.options.width + '%; --gridColumn: 1/3'
+                : '--width: ' + item.options.width * 2 + '%; --gridColumn: auto'
+            "
+            v-for="(item, index) in list"
             :key="index"
           >
             <div v-if="item.type === 'Text' || item.type === 'Email'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label }}
+                <span v-if="item.options.required">*</span></label
               >
               <input
                 :id="'field-item-' + index"
-                :placeholder="item.placeholder"
+                :placeholder="item.options.placeholder"
                 :type="item.type.toLowerCase()"
-                :required="item.required"
-                v-model="item.value"
+                :required="item.options.required"
+                v-model="item.options.value"
               />
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
             <div v-else-if="item.type === 'Long Text'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label }} <span v-if="item.options.required">*</span></label
               >
               <textarea
                 :id="'field-item-' + index"
-                :placeholder="item.placeholder"
-                :required="item.required"
-                v-model="item.value"
+                :placeholder="item.options.placeholder"
+                :required="item.options.required"
+                v-model="item.options.value"
               />
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
             <div v-else-if="item.type === 'Datetime'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label
+                }}<span v-if="item.options.required">*</span></label
               >
               <input
                 type="datetime-local"
                 :id="'field-item-' + index"
-                :placeholder="item.placeholder"
-                :required="item.required"
-                v-model="item.value"
+                :required="item.options.required"
+                v-model="item.options.value"
               />
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
             <div v-else-if="item.type === 'Select'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label }}
+                <span v-if="item.options.required">*</span></label
               >
               <select
                 :id="'field-item-' + index"
-                :required="item.required"
-                v-model="item.value"
+                :required="item.options.required"
+                v-model="item.options.value"
               >
                 <option
-                  v-for="(i, index) in item.options"
+                  v-for="(i, index) in item.options.options"
                   :key="index"
                   :value="i.value"
                 >
                   {{ i.text }}
                 </option>
               </select>
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
             <div v-else-if="item.type === 'Checkbox'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label }}
+                <span v-if="item.options.required">*</span></label
               >
               <div
                 class="option"
-                v-for="(i, position) in item.options"
+                v-for="(i, position) in item.options.options"
                 :key="position"
               >
                 <input
@@ -286,15 +294,16 @@
                   i.text
                 }}</label>
               </div>
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
             <div v-else-if="item.type === 'Radio'">
               <label :for="'field-item-' + index"
-                >{{ item.label }} <span v-if="item.required">*</span></label
+                >{{ item.options.label }}
+                <span v-if="item.options.required">*</span></label
               >
               <div
                 class="option"
-                v-for="(i, position) in item.options"
+                v-for="(i, position) in item.options.options"
                 :key="position"
               >
                 <input
@@ -302,14 +311,14 @@
                   :id="'radio-' + index + '' + position"
                   :value="i.value"
                   :name="'radio-' + index"
-                  :required="item.required"
+                  :required="item.options.required"
                   @change="selectOptions($event, index)"
                 />
                 <label :for="'radio-' + index + '' + position">{{
                   i.text
                 }}</label>
               </div>
-              <span class="description">{{ item.description }}</span>
+              <span class="description">{{ item.options.description }}</span>
             </div>
           </div>
         </div>
@@ -340,7 +349,11 @@ export default {
       selected: null,
       showAddList: false,
       createType: null,
+      list: [],
     };
+  },
+  created() {
+    this.list = Object.assign([], this.fields);
   },
   computed: {
     fields() {
@@ -352,7 +365,7 @@ export default {
       console.log(this.fields[index]);
       if (this.selected !== index) {
         this.closeAdd();
-        this.formEdit = Object.assign([], this.fields[index]);
+        this.formEdit = Object.assign({}, this.fields[index].options);
         this.selected = index;
         document.getElementById("output-value-edit-" + index).innerHTML =
           this.formEdit.width + " %";
@@ -425,14 +438,20 @@ export default {
       list.options.splice(index, 1);
     },
     addNewItem() {
-      this.form.type = this.createType;
+      // this.form.type = this.createType;
       this.form.width = document.getElementById("form-width").value;
       if (this.createType === "Checkbox" || this.createType === "Radio") {
         this.form.listSelected = [];
       } else {
         this.form.value = "";
       }
-      this.$store.commit("addFormContactItem", this.form);
+      this.$store.commit("addFormContactItem", {
+        children: [],
+        options: this.form,
+        type: this.createType,
+        index: this.fields.length + 1,
+      });
+      this.list.push(this.fields[this.fields.length - 1]);
       this.closeAdd();
     },
     changeItemContent(index) {
@@ -441,10 +460,12 @@ export default {
         formEdit: this.formEdit,
         width: document.getElementById("edit-width-" + index).value,
       });
+      this.list[index] = this.fields[index];
       this.closeItemDetail();
     },
     deleteItem(index) {
       this.$store.commit("deleteFormContactItem", index);
+      this.list.splice(index, 1);
     },
     onUpdateWidth(e) {
       let width = e.target.value;
@@ -483,6 +504,7 @@ export default {
         index: index,
         value: e.target.value,
       });
+      this.list[index] = this.fields[index];
     },
     showSuccessMsg() {
       let message = "Submit successful!\n";

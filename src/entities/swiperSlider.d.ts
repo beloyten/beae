@@ -1,5 +1,12 @@
+import { Field } from "./field";
+
 export interface SwiperSlider {
-  img: string;
-  title: string;
-  content: string;
+  children?: Array<Field>;
+  options: {
+    img: string;
+    title: string;
+    content: string;
+  };
+  type: string;
+  index: number;
 }

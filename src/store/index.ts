@@ -51,9 +51,10 @@ const store = createStore({
   },
   mutations: {
     changeGalleryItemContent(state: any, data: any) {
-      state.galleryListItems[data.index].title = data.gallery.title;
-      state.galleryListItems[data.index].thumbnail = data.gallery.thumbnail;
-      state.galleryListItems[data.index].src = data.gallery.src;
+      state.galleryListItems[data.index].options.title = data.gallery.title;
+      state.galleryListItems[data.index].options.thumbnail =
+        data.gallery.thumbnail;
+      state.galleryListItems[data.index].options.src = data.gallery.src;
       const indexChange = state.galleryListItems[data.index].index;
       state.galleryListItems.forEach((item: any, i: number) => {
         if (i + 1 === data.itemIndex) {
@@ -63,8 +64,8 @@ const store = createStore({
         }
       });
     },
-    addGalleryItem(state: any, item: any) {
-      state.galleryListItems.push(item as Gallery);
+    addGalleryItem(state: any, item: Gallery) {
+      state.galleryListItems.push(item);
     },
     deleteGalleryItem(state: any, index: number) {
       state.galleryListItems.splice(index, 1);
@@ -76,17 +77,17 @@ const store = createStore({
       state.formContactList.splice(index, 1);
     },
     changeFormContactItemContent(state: any, data: any) {
-      state.formContactList[data.index] = data.formEdit;
-      state.formContactList[data.index].width = data.width;
+      state.formContactList[data.index].options = data.formEdit;
+      state.formContactList[data.index].options.width = data.width;
     },
     selecOptionFormContact(state: any, data: any) {
       console.log(data);
-      if (!state.formContactList[data.index].listSelected) {
-        state.formContactList[data.index].listSelected = [];
-        state.formContactList[data.index].listSelected.push(data.value);
+      if (!state.formContactList[data.index].options.listSelected) {
+        state.formContactList[data.index].options.listSelected = [];
+        state.formContactList[data.index].options.listSelected.push(data.value);
       } else {
         let i = -1;
-        state.formContactList[data.index].listSelected.forEach(
+        state.formContactList[data.index].options.listSelected.forEach(
           (item: any, position: number) => {
             if (item === data.value) {
               i = position;
@@ -94,9 +95,11 @@ const store = createStore({
           }
         );
         if (i !== -1) {
-          state.formContactList[data.index].listSelected.splice(i, 1);
+          state.formContactList[data.index].options.listSelected.splice(i, 1);
         } else {
-          state.formContactList[data.index].listSelected.push(data.value);
+          state.formContactList[data.index].options.listSelected.push(
+            data.value
+          );
         }
       }
     },
@@ -107,9 +110,10 @@ const store = createStore({
       state.swiperSliderListItems.splice(index, 1);
     },
     changeSwiperSliderItemContent(state: any, data: any) {
-      state.swiperSliderListItems[data.index].title = data.item.title;
-      state.swiperSliderListItems[data.index].content = data.item.content;
-      state.swiperSliderListItems[data.index].img = data.item.img;
+      state.swiperSliderListItems[data.index].options.title = data.item.title;
+      state.swiperSliderListItems[data.index].options.content =
+        data.item.content;
+      state.swiperSliderListItems[data.index].options.img = data.item.img;
     },
     setGalleryOptions(state: any, data: any) {
       state.galleryOptions.columns = data.columns;
@@ -121,14 +125,27 @@ const store = createStore({
       state.swiperSliderOptions.pagination = data.pagination;
       state.swiperSliderOptions.navigation = data.navigation;
     },
-    addComponentFormItem(state: any, item: any) {
+    addComponentFormSection(state: any, item: any) {
       state.componentFormListItems.push(item);
     },
-    deleteComponentFormItem(state: any, index: number) {
+    deleteComponentFormSection(state: any, index: number) {
       state.componentFormListItems.splice(index, 1);
     },
+    addComponentFormItem(state: any, item: any) {
+      state.componentFormListItems[item.sectionIndex].section.items.push(
+        item.data
+      );
+    },
+    deleteComponentFormItem(state: any, item: any) {
+      state.componentFormListItems[item.sectionIndex].section.items.splice(
+        item.index,
+        1
+      );
+    },
     setComponentFormItemOptions(state: any, data: any) {
-      state.componentFormListItems[data.index].fields.options = data.options;
+      state.componentFormListItems[data.sectionIndex].section.items[
+        data.index
+      ].options = data.options;
     },
     addListItemComponentForm(state: any, data: any) {
       state.componentFormListItems[data.index].fields.list.push(data.item);

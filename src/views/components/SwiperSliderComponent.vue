@@ -24,19 +24,19 @@
       :modules="modules"
       class="mySwiper"
     >
-      <swiper-slide v-for="(item, index) in fields.list" :key="index">
+      <swiper-slide v-for="(item, index) in fields.children" :key="index">
         <div class="slider-item">
           <img
             :src="
-              item.img
-                ? item.img
+              item.options.img
+                ? item.options.img
                 : 'https://swiperjs.com/demos/images/nature-9.jpg'
             "
             alt=""
           />
           <div class="content">
-            <h3>{{ item.title }}</h3>
-            <p>{{ item.content }}</p>
+            <h3>{{ item.options.title }}</h3>
+            <p>{{ item.options.content }}</p>
           </div>
         </div>
       </swiper-slide>

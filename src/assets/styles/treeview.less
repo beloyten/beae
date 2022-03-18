@@ -1,0 +1,18 @@
+.tree-view {
+  padding-left: 10%;
+  margin-top: 10px;
+  display: none;
+  &.active {
+    display: block;
+  }
+  .tree-item {
+    margin-top: 5px;
+    margin-bottom: 5px;
+    .tree-title {
+      &:hover {
+        cursor: pointer;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}

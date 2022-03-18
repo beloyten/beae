@@ -6,73 +6,82 @@
           class="item"
           :class="item.type"
           :id="'item-' + index"
+          :style="
+            item.options.width > 50
+              ? '--width: ' + item.options.width + '%; --gridColumn: 1/3'
+              : '--width: ' + item.options.width * 2 + '%; --gridColumn: auto'
+          "
           v-for="(item, index) in list"
           :key="index"
         >
           <div v-if="item.type === 'Text' || item.type === 'Email'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <input
               :id="'field-item-' + index"
-              :placeholder="item.placeholder"
+              :placeholder="item.options.placeholder"
               :type="item.type.toLowerCase()"
-              :required="item.required"
-              v-model="item.value"
+              :required="item.options.required"
+              v-model="item.options.value"
             />
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
           <div v-else-if="item.type === 'Long Text'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <textarea
               :id="'field-item-' + index"
-              :placeholder="item.placeholder"
-              :required="item.required"
-              v-model="item.value"
+              :placeholder="item.options.placeholder"
+              :required="item.options.required"
+              v-model="item.options.value"
             />
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
           <div v-else-if="item.type === 'Datetime'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <input
               type="datetime-local"
               :id="'field-item-' + index"
-              :placeholder="item.placeholder"
-              :required="item.required"
-              v-model="item.value"
+              :required="item.options.required"
+              v-model="item.options.value"
             />
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
           <div v-else-if="item.type === 'Select'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <select
               :id="'field-item-' + index"
-              :required="item.required"
-              v-model="item.value"
+              :required="item.options.required"
+              v-model="item.options.value"
             >
               <option
-                v-for="(i, index) in item.options"
+                v-for="(i, index) in item.options.options"
                 :key="index"
                 :value="i.value"
               >
                 {{ i.text }}
               </option>
             </select>
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
           <div v-else-if="item.type === 'Checkbox'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <div
               class="option"
-              v-for="(i, position) in item.options"
+              v-for="(i, position) in item.options.options"
               :key="position"
             >
               <input
@@ -85,15 +94,16 @@
                 i.text
               }}</label>
             </div>
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
           <div v-else-if="item.type === 'Radio'">
             <label :for="'field-item-' + index"
-              >{{ item.label }} <span v-if="item.required">*</span></label
+              >{{ item.options.label }}
+              <span v-if="item.options.required">*</span></label
             >
             <div
               class="option"
-              v-for="(i, position) in item.options"
+              v-for="(i, position) in item.options.options"
               :key="position"
             >
               <input
@@ -101,14 +111,14 @@
                 :id="'radio-' + index + '' + position"
                 :value="i.value"
                 :name="'radio-' + index"
-                :required="item.required"
+                :required="item.options.required"
                 @change="selectOptions($event, index)"
               />
               <label :for="'radio-' + index + '' + position">{{
                 i.text
               }}</label>
             </div>
-            <span class="description">{{ item.description }}</span>
+            <span class="description">{{ item.options.description }}</span>
           </div>
         </div>
       </div>
@@ -131,10 +141,11 @@ export default {
     onSubmit() {
       let check = true;
       this.list.forEach((item) => {
-        if (item.type === "Checkbox" && item.required) {
+        if (item.type === "Checkbox" && item.options.required) {
           if (
-            !item.listSelected ||
-            (item.listSelected && item.listSelected.length === 0)
+            !item.options.listSelected ||
+            (item.options.listSelected &&
+              item.options.listSelected.length === 0)
           ) {
             check = false;
             alert("Please input required Checkbox!");
@@ -151,9 +162,12 @@ export default {
       this.list.forEach((item) => {
         if (item.type === "Checkbox" || item.type === "Radio") {
           message +=
-            item.label + ": " + this.arrayToString(item.listSelected) + "\n";
+            item.options.label +
+            ": " +
+            this.arrayToString(item.options.listSelected) +
+            "\n";
         } else {
-          message += item.label + ": " + item.value + "\n";
+          message += item.options.label + ": " + item.options.value + "\n";
         }
       });
       alert(message);
@@ -177,20 +191,8 @@ export default {
       });
     },
   },
-  mounted() {
-    this.fields.fields.list.forEach((item, index) => {
-      let element = document.getElementById("item-" + index).style;
-      if (item.width > 50) {
-        element.gridColumn = "1/3";
-        element.width = item.width + "%";
-      } else {
-        element.gridColumn = "auto";
-        element.width = item.width * 2 + "%";
-      }
-    });
-  },
   created() {
-    this.list = Object.assign([], this.fields.fields.list);
+    this.list = Object.assign([], this.fields.children);
   },
 };
 </script>

@@ -62,7 +62,7 @@
             :key="index"
           >
             <div class="title" @click="select(index)">
-              {{ item.title }}
+              {{ item.options.title }}
             </div>
             <div class="item-content" v-if="selected === index">
               <div>
@@ -116,15 +116,15 @@
           <div class="slider-item">
             <img
               :src="
-                item.img
-                  ? item.img
+                item.options.img
+                  ? item.options.img
                   : 'https://swiperjs.com/demos/images/nature-9.jpg'
               "
               alt=""
             />
             <div class="content">
-              <h3>{{ item.title }}</h3>
-              <p>{{ item.content }}</p>
+              <h3>{{ item.options.title }}</h3>
+              <p>{{ item.options.content }}</p>
             </div>
           </div>
         </swiper-slide>
@@ -179,6 +179,9 @@ export default {
     this.itemPerPageConfig = this.swiperSliderOptions.itemsPerPage;
     this.paginationConfig = this.swiperSliderOptions.pagination;
     this.navigationConfig = this.swiperSliderOptions.navigation;
+    this.itemPerPage = this.swiperSliderOptions.itemsPerPage;
+    this.pagination = this.swiperSliderOptions.pagination;
+    this.navigation = this.swiperSliderOptions.navigation;
   },
   methods: {
     openFormAdd() {
@@ -193,9 +196,14 @@ export default {
     },
     addNewItem() {
       this.$store.commit("addNewSwiperSlider", {
-        img: this.itemImg,
-        title: this.itemTitle,
-        content: this.itemContent,
+        children: [],
+        options: {
+          img: this.itemImg,
+          title: this.itemTitle,
+          content: this.itemContent,
+        },
+        type: "Slider",
+        index: this.slides.length + 1,
       });
       this.cancelAdd();
     },
@@ -207,9 +215,9 @@ export default {
       if (this.selected !== index) {
         this.cancelAdd();
         this.selected = index;
-        this.itemTitle = this.slides[index].title;
-        this.itemContent = this.slides[index].content;
-        this.itemImg = this.slides[index].img;
+        this.itemTitle = this.slides[index].options.title;
+        this.itemContent = this.slides[index].options.content;
+        this.itemImg = this.slides[index].options.img;
       } else {
         this.closeItemDetail();
       }

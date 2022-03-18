@@ -51,7 +51,7 @@
             :class="selected === index ? 'active' : ''"
             :key="index">
             <div class="title" @click="select(index)">
-              {{ item.title }}
+              {{ item.options.title }}
             </div>
             <div class="item-content" v-if="selected === index">
               <div>
@@ -84,7 +84,19 @@
         </ul>
       </div>
     </div>
-    <div class="right" id="grid-content">
+    <div
+      class="right"
+      id="grid-content"
+      :style="
+        '--column: ' +
+        galleryOptions.columns +
+        '; --rowGap: ' +
+        galleryOptions.rowGap +
+        'px;--columnGap: ' +
+        galleryOptions.columnGap +
+        'px;'
+      "
+    >
       <div
         v-for="(item, index) in sortItems"
         class="item"
@@ -92,7 +104,7 @@
         :key="index"
         @click="openImage(item)"
       >
-        <img :src="item.src" alt="" />
+        <img :src="item.options.thumbnail" alt="" />
       </div>
     </div>
     <LightBox
@@ -156,9 +168,9 @@ export default {
       if (this.selected !== index) {
         this.cancelAdd();
         this.selected = index;
-        this.itemTitle = this.sortItems[index].title;
-        this.itemThumbnail = this.sortItems[index].thumbnail;
-        this.itemSrc = this.sortItems[index].src;
+        this.itemTitle = this.sortItems[index].options.title;
+        this.itemThumbnail = this.sortItems[index].options.thumbnail;
+        this.itemSrc = this.sortItems[index].options.src;
         this.itemIndex = this.sortItems[index].index;
       } else {
         this.closeItemDetail();
@@ -170,10 +182,6 @@ export default {
       } else if (this.columnGap < 0 || this.rowGap < 0) {
         alert("The gap values must be >= 0!");
       } else {
-        let gridContent = document.getElementById("grid-content");
-        gridContent.style.gridTemplateColumns =
-          "repeat(" + this.columns + ", 1fr)";
-        gridContent.style.gap = this.rowGap + "px " + this.columnGap + "px";
         this.$store.commit("setGalleryOptions", {
           columns: this.columns,
           rowGap: this.rowGap,
@@ -183,7 +191,8 @@ export default {
     },
     resetCSS() {
       this.columns = 4;
-      this.gap = 50;
+      this.rowGap = 50;
+      this.columnGap = 50;
       this.applyCSS();
     },
     changeItemContent(index) {
@@ -220,9 +229,13 @@ export default {
     },
     addNewItem() {
       this.$store.commit("addGalleryItem", {
-        src: this.itemSrc,
-        title: this.itemTitle,
-        thumbnail: this.itemThumbnail,
+        children: [],
+        options: {
+          src: this.itemSrc,
+          title: this.itemTitle,
+          thumbnail: this.itemThumbnail,
+        },
+        type: "Image",
         index: this.listGallery.length + 1,
       });
       this.cancelAdd();

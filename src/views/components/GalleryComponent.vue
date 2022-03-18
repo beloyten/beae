@@ -1,5 +1,17 @@
 <template>
-  <div class="gallery-component" id="gallery-component">
+  <div
+    class="gallery-component"
+    id="gallery-component"
+    :style="
+      '--column: ' +
+      items.options.columns +
+      '; --rowGap: ' +
+      items.options.rowGap +
+      'px;--columnGap: ' +
+      items.options.columnGap +
+      'px;'
+    "
+  >
     <div
       v-for="(item, index) in listItems"
       class="item"
@@ -7,7 +19,7 @@
       :key="index"
       @click="openImage(item)"
     >
-      <img :src="item.src" alt="" />
+      <img :src="item.options.thumbnail" alt="" />
     </div>
     <LightBox
       v-if="openPopup"
@@ -32,12 +44,9 @@ export default {
     };
   },
   computed: {
-    options() {
-      return this.items.options;
-    },
     listItems() {
       let newArrays = [];
-      newArrays = Object.assign([], this.items.list);
+      newArrays = Object.assign([], this.items.children);
       for (let i = 0; i < newArrays.length - 1; i++) {
         for (let j = i + 1; j < newArrays.length; j++) {
           if (newArrays[i].index > newArrays[j].index) {
@@ -55,15 +64,6 @@ export default {
       if (!e) {
         this.selectedItem = null;
       }
-    },
-    options: {
-      handler: function (e) {
-        let gridContent = document.getElementById("gallery-component");
-        gridContent.style.gridTemplateColumns =
-          "repeat(" + e.columns + ", 1fr)";
-        gridContent.style.gap = e.rowGap + "px " + e.columnGap + "px";
-      },
-      deep: true,
     },
   },
   methods: {

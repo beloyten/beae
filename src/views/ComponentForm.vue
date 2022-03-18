@@ -5,6 +5,12 @@
         <div class="list-item-title">
           <ul>
             <li
+              @click="setTab('content')"
+              :class="tab === 'content' ? 'active' : ''"
+            >
+              Content
+            </li>
+            <li
               @click="setTab('navigator')"
               :class="tab === 'navigator' ? 'active' : ''"
             >
@@ -18,7 +24,7 @@
             </li>
           </ul>
         </div>
-        <div class="item-content-elements" v-if="tab === 'elements'">
+        <div class="item-content-elements" v-show="tab === 'elements'">
           <div class="button" id="gallery" draggable="true" @dragstart="drag">
             Gallery
           </div>
@@ -48,7 +54,7 @@
             Image Upload
           </div>
         </div>
-        <div v-else class="item-content-navigator">
+        <div v-show="tab === 'content'" class="item-content-content">
           <div class="options" v-if="keyOptions.length > 0">
             <h4>Options</h4>
             <div class="option-list">
@@ -57,7 +63,7 @@
                 v-for="(item, index) in keyOptions"
                 :key="index"
                 :class="
-                  typeof selectedField.fields.options[item] === 'boolean'
+                  typeof selectedField.options[item] === 'boolean'
                     ? 'checkbox'
                     : ''
                 "
@@ -84,16 +90,22 @@
                       ? "Pagination"
                       : item === "navigation"
                       ? "Navigation"
-                      : ""
+                      : item
+                          .toLowerCase()
+                          .split(" ")
+                          .map(function (Word) {
+                            return Word[0].toUpperCase() + Word.substr(1);
+                          })
+                          .join(" ")
                   }}</label
                 >
                 <input
                   :type="
-                    typeof selectedField.fields.options[item] === 'string'
+                    typeof selectedField.options[item] === 'string'
                       ? 'text'
-                      : typeof selectedField.fields.options[item] === 'number'
+                      : typeof selectedField.options[item] === 'number'
                       ? 'number'
-                      : typeof selectedField.fields.options[item] === 'boolean'
+                      : typeof selectedField.options[item] === 'boolean'
                       ? 'checkbox'
                       : ''
                   "
@@ -124,7 +136,7 @@
               <h4>Items</h4>
               <button
                 @click="openFormAdd()"
-                v-if="selectedField.type !== 'form-contact'"
+                v-if="selectedField.type !== 'Form Contact'"
               >
                 Add
               </button>
@@ -132,7 +144,7 @@
               <div
                 class="add-list"
                 :class="showAddList ? 'show' : ''"
-                v-if="selectedField.type === 'form-contact'"
+                v-if="selectedField.type === 'Form Contact'"
               >
                 <span @click="closeAdd()">x</span>
                 <ul>
@@ -147,18 +159,18 @@
               </div>
             </div>
             <div class="add-new" v-if="checkAddNew">
-              <div class="title" v-if="selectedField.type === 'form-contact'">
+              <div class="title" v-if="selectedField.type === 'Form Contact'">
                 Add new {{ createType }}
               </div>
               <div class="title" v-else>Add new</div>
               <div class="item-content">
-                <div v-if="selectedField.type === 'form-contact'">
+                <div v-if="selectedField.type === 'Form Contact'">
                   <label for="form-label">Label</label>
                   <input id="form-label" type="text" v-model="form.label" />
                 </div>
                 <div
                   v-if="
-                    selectedField.type === 'form-contact' &&
+                    selectedField.type === 'Form Contact' &&
                     (createType === 'Text' ||
                       createType === 'Email' ||
                       createType === 'Long Text')
@@ -171,14 +183,14 @@
                     v-model="form.placeholder"
                   />
                 </div>
-                <div v-if="selectedField.type === 'form-contact'">
+                <div v-if="selectedField.type === 'Form Contact'">
                   <label for="form-description">Description</label>
                   <textarea id="form-description" v-model="form.description" />
                   <span>Description about the field</span>
                 </div>
                 <div
                   class="required"
-                  v-if="selectedField.type === 'form-contact'"
+                  v-if="selectedField.type === 'Form Contact'"
                 >
                   <label for="form-required">Required</label>
                   <input
@@ -190,7 +202,7 @@
                 <div
                   class="options-list"
                   v-if="
-                    selectedField.type === 'form-contact' &&
+                    selectedField.type === 'Form Contact' &&
                     (createType === 'Select' ||
                       createType === 'Checkbox' ||
                       createType === 'Radio')
@@ -221,7 +233,7 @@
                 </div>
                 <div
                   class="field-width"
-                  v-if="selectedField.type === 'form-contact'"
+                  v-if="selectedField.type === 'Form Contact'"
                 >
                   <label for="form-width">Field width</label>
                   <div class="slider">
@@ -238,14 +250,14 @@
                 </div>
                 <div
                   v-if="
-                    selectedField.type === 'gallery' ||
-                    selectedField.type === 'swiper-slider'
+                    selectedField.type === 'Gallery' ||
+                    selectedField.type === 'Swiper Slider'
                   "
                 >
                   <label for="new-title">Title</label>
                   <input id="new-title" type="text" v-model="itemTitle" />
                 </div>
-                <div v-if="selectedField.type === 'gallery'">
+                <div v-if="selectedField.type === 'Gallery'">
                   <label for="new-thumbnail">Thumbnail</label>
                   <input
                     id="new-thumbnail"
@@ -253,15 +265,15 @@
                     v-model="itemThumbnail"
                   />
                 </div>
-                <div v-if="selectedField.type === 'gallery'">
+                <div v-if="selectedField.type === 'Gallery'">
                   <label for="new-src">Src</label>
                   <input id="new-src" type="text" v-model="itemSrc" />
                 </div>
-                <div v-if="selectedField.type === 'swiper-slider'">
+                <div v-if="selectedField.type === 'Swiper Slider'">
                   <label for="new-content">Content</label>
                   <input id="new-content" type="text" v-model="itemContent" />
                 </div>
-                <div v-if="selectedField.type === 'swiper-slider'">
+                <div v-if="selectedField.type === 'Swiper Slider'">
                   <label for="new-image">Image</label>
                   <input id="new-image" type="text" v-model="itemImg" />
                 </div>
@@ -281,13 +293,13 @@
                   {{ item.title ? item.title : item.type }}
                 </div>
                 <div class="item-content" v-show="selected === index">
-                  <div v-if="selectedField.type === 'form-contact'">
+                  <div v-if="selectedField.type === 'Form Contact'">
                     <label for="edit-label">Label</label>
                     <input id="edit-label" type="text" v-model="form.label" />
                   </div>
                   <div
                     v-if="
-                      selectedField.type === 'form-contact' &&
+                      selectedField.type === 'Form Contact' &&
                       (item.type === 'Text' ||
                         item.type === 'Email' ||
                         item.type === 'Long Text')
@@ -300,7 +312,7 @@
                       v-model="form.placeholder"
                     />
                   </div>
-                  <div v-if="selectedField.type === 'form-contact'">
+                  <div v-if="selectedField.type === 'Form Contact'">
                     <label for="edit-description">Description</label>
                     <textarea
                       id="edit-description"
@@ -310,7 +322,7 @@
                   </div>
                   <div
                     class="required"
-                    v-if="selectedField.type === 'form-contact'"
+                    v-if="selectedField.type === 'Form Contact'"
                   >
                     <label for="edit-required">Required</label>
                     <input
@@ -322,7 +334,7 @@
                   <div
                     class="options-list"
                     v-if="
-                      selectedField.type === 'form-contact' &&
+                      selectedField.type === 'Form Contact' &&
                       (item.type === 'Select' ||
                         item.type === 'Checkbox' ||
                         item.type === 'Radio')
@@ -353,7 +365,7 @@
                   </div>
                   <div
                     class="field-width"
-                    v-if="selectedField.type === 'form-contact'"
+                    v-if="selectedField.type === 'Form Contact'"
                   >
                     <label :for="'edit-width-' + index">Field width</label>
                     <div class="slider">
@@ -370,18 +382,18 @@
                   </div>
                   <div
                     v-if="
-                      selectedField.type === 'gallery' ||
-                      selectedField.type === 'swiper-slider'
+                      selectedField.type === 'Gallery' ||
+                      selectedField.type === 'Swiper Slider'
                     "
                   >
                     <label for="edit-title">Title</label>
                     <input id="edit-title" type="text" v-model="itemTitle" />
                   </div>
-                  <div v-if="selectedField.type === 'gallery'">
+                  <div v-if="selectedField.type === 'Gallery'">
                     <label for="edit-index">Index</label>
                     <input id="edit-index" type="number" v-model="itemIndex" />
                   </div>
-                  <div v-if="selectedField.type === 'gallery'">
+                  <div v-if="selectedField.type === 'Gallery'">
                     <label for="edit-thumbnail">Thumbnail</label>
                     <input
                       id="edit-thumbnail"
@@ -389,11 +401,11 @@
                       v-model="itemThumbnail"
                     />
                   </div>
-                  <div v-if="selectedField.type === 'gallery'">
+                  <div v-if="selectedField.type === 'Gallery'">
                     <label for="edit-src">Src</label>
                     <input id="edit-src" type="text" v-model="itemSrc" />
                   </div>
-                  <div v-if="selectedField.type === 'swiper-slider'">
+                  <div v-if="selectedField.type === 'Swiper Slider'">
                     <label for="edit-content">Content</label>
                     <input
                       id="edit-content"
@@ -401,7 +413,7 @@
                       v-model="itemContent"
                     />
                   </div>
-                  <div v-if="selectedField.type === 'swiper-slider'">
+                  <div v-if="selectedField.type === 'Swiper Slider'">
                     <label for="edit-image">Image</label>
                     <input id="edit-image" type="text" v-model="itemImg" />
                   </div>
@@ -415,6 +427,26 @@
             </ul>
           </div>
         </div>
+        <div v-show="tab === 'navigator'" class="item-content-navigator">
+          <div class="navigator-action">
+            <button>Add section</button>
+          </div>
+          <div
+            v-for="(item, index) in sortComponentForm"
+            :key="index"
+            class="navigator-item"
+            id="navigator-item"
+          >
+            <div class="title" @click="showSection">
+              Section {{ index + 1 }}
+            </div>
+            <tree-view
+              :items="item.section.items"
+              @select-children="selectChildren"
+              deep="0"
+            />
+          </div>
+        </div>
       </div>
     </div>
     <div class="right" id="div" @drop.prevent="drop" @dragover.prevent>
@@ -422,25 +454,46 @@
         v-for="(item, index) in sortComponentForm"
         :key="index"
         class="form-component"
-        @click="selectField(item, index)"
-        :class="selectedFieldIndex === index ? 'active' : ''"
       >
-        <span @click.stop="deleteComponent(index)" class="delete-component"
+        <span
+          @click.stop="deleteComponent(index)"
+          class="delete-component"
+          v-if="sortComponentForm.length > 1"
+          title="Delete this section"
           >x</span
         >
-        <gallery-component
-          v-if="item.type === 'gallery'"
-          :items="item.fields"
-        />
-        <form-contact-component
-          v-else-if="item.type === 'form-contact'"
-          :fields="item"
-        />
-        <swiper-slider-component
-          v-else-if="item.type === 'swiper-slider'"
-          :fields="item.fields"
-        />
-        <text-component v-else-if="item.type === 'text'" :fields="item" />
+        <div
+          v-if="sortComponentForm[sectionIndex].section.items.length === 0"
+          class="no-data"
+        >
+          Select elements to create your page
+        </div>
+        <div v-else>
+          <div
+            v-for="(field, i) in sortComponentForm[sectionIndex].section.items"
+            :key="i"
+            class="component-item"
+            @click="selectField(field, i)"
+            :class="selectedFieldIndex === i ? 'active' : ''"
+          >
+            <span
+              @click.stop="deleteComponentItem(i)"
+              class="delete-component"
+              title="Delete this item"
+              >x</span
+            >
+            <gallery-component v-if="field.type === 'Gallery'" :items="field" />
+            <form-contact-component
+              v-else-if="field.type === 'Form Contact'"
+              :fields="field"
+            />
+            <swiper-slider-component
+              v-else-if="field.type === 'Swiper Slider'"
+              :fields="field"
+            />
+            <text-component v-else-if="field.type === 'Text'" :fields="field" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -451,6 +504,7 @@ import GalleryComponent from "./components/GalleryComponent.vue";
 import FormContactComponent from "./components/FormContactComponent.vue";
 import SwiperSliderComponent from "./components/SwiperSliderComponent.vue";
 import TextComponent from "./components/TextComponent.vue";
+import TreeView from "./components/TreeView.vue";
 import GalleryData from "@/data/gallery";
 import FormContactData from "@/data/formContact";
 import SwiperSliderData from "@/data/swiperSlider";
@@ -461,6 +515,7 @@ export default {
     FormContactComponent,
     SwiperSliderComponent,
     TextComponent,
+    TreeView,
   },
   data() {
     return {
@@ -474,7 +529,6 @@ export default {
       itemSrc: "",
       itemContent: "",
       itemImg: "",
-      selectedItem: {},
       selectedFieldIndex: null,
       showAddList: false,
       form: {
@@ -485,6 +539,8 @@ export default {
       },
       options: {},
       createType: null,
+      sectionIndex: 0,
+      keyOptions: [],
     };
   },
   computed: {
@@ -504,17 +560,10 @@ export default {
       }
       return newArrays;
     },
-    keyOptions() {
-      return this.selectedField &&
-        this.selectedField.fields &&
-        this.selectedField.fields.options
-        ? Object.keys(this.selectedField.fields.options)
-        : [];
-    },
     listItems() {
       let newArrays = [];
-      if (this.selectedField.type === "gallery") {
-        newArrays = Object.assign([], this.selectedField.fields.list);
+      if (this.selectedField.type === "Gallery") {
+        newArrays = Object.assign([], this.selectedField.children);
         for (let i = 0; i < newArrays.length - 1; i++) {
           for (let j = i + 1; j < newArrays.length; j++) {
             if (newArrays[i].index > newArrays[j].index) {
@@ -525,13 +574,16 @@ export default {
           }
         }
       } else {
-        newArrays = this.selectedField.fields.list;
+        newArrays = this.selectedField.children;
       }
       return newArrays;
     },
   },
   methods: {
     setTab(string) {
+      console.log(this.keyOptions);
+      console.log(this.selectedField);
+      console.log(this.selectedFieldIndex);
       this.tab = string;
     },
     drag(e) {
@@ -540,74 +592,71 @@ export default {
     drop(e) {
       let id = e.dataTransfer.getData("id");
       if (id === "gallery") {
-        this.options = {
-          columns: 4,
-          rowGap: 50,
-          columnGap: 50,
-        };
         this.$store.commit("addComponentFormItem", {
-          fields: {
-            list: GalleryData,
+          sectionIndex: this.sectionIndex,
+          data: {
+            children: GalleryData,
             options: {
               columns: 4,
               rowGap: 50,
               columnGap: 50,
             },
+            type: "Gallery",
+            index: this.listComponentForm.length + 1,
           },
-          type: "gallery",
-          index: this.listComponentForm.length + 1,
         });
       } else if (id === "contact-form") {
-        this.options = {};
         this.$store.commit("addComponentFormItem", {
-          fields: {
-            list: FormContactData,
+          sectionIndex: this.sectionIndex,
+          data: {
+            children: FormContactData,
             options: {},
+            type: "Form Contact",
+            index: this.listComponentForm.length + 1,
           },
-          type: "form-contact",
-          index: this.listComponentForm.length + 1,
         });
       } else if (id === "slider") {
-        this.options = {
-          itemsPerPage: 3,
-          pagination: true,
-          navigation: true,
-        };
         this.$store.commit("addComponentFormItem", {
-          fields: {
-            list: SwiperSliderData,
+          sectionIndex: this.sectionIndex,
+          data: {
+            children: SwiperSliderData,
             options: {
               itemsPerPage: 3,
               pagination: true,
               navigation: true,
             },
+            type: "Swiper Slider",
+            index: this.listComponentForm.length + 1,
           },
-          type: "swiper-slider",
-          index: this.listComponentForm.length + 1,
         });
       } else if (id === "text") {
-        this.options = {};
         this.$store.commit("addComponentFormItem", {
-          fields: {
-            list: [
-              {
-                label: "New input",
-                description: "",
-                width: 50,
-                required: false,
-                placeholder: "Input text",
-              },
-            ],
-            options: {},
+          sectionIndex: this.sectionIndex,
+          data: {
+            children: [],
+            fields: {
+              list: [
+                {
+                  label: "New input",
+                  description: "",
+                  width: 50,
+                  required: false,
+                  placeholder: "Input text",
+                },
+              ],
+              options: {},
+            },
+            type: "Text",
+            index: this.listComponentForm.length + 1,
           },
-          type: "text",
-          index: this.listComponentForm.length + 1,
         });
       }
-      this.selectedFieldIndex = this.listComponentForm.length - 1;
-      this.selectedField =
-        this.listComponentForm[this.listComponentForm.length - 1];
-      console.log(this.listComponentForm);
+      this.selectField(
+        this.listComponentForm[this.sectionIndex].section.items[
+          this.listComponentForm[this.sectionIndex].section.items.length - 1
+        ],
+        this.listComponentForm[this.sectionIndex].section.items.length - 1
+      );
     },
     openFormAdd() {
       this.closeItemDetail();
@@ -619,7 +668,7 @@ export default {
       this.checkAddNew = false;
     },
     closeItemDetail() {
-      if (this.selected && this.selectedField.type === "form-contact") {
+      if (this.selected && this.selectedField.type === "Form Contact") {
         let width = this.selectedField.fields.list[this.selected].width;
         let element = document.getElementById("item-" + this.selected).style;
         document.getElementById(
@@ -649,12 +698,12 @@ export default {
       if (this.selected !== index) {
         this.cancelAdd();
         this.selected = index;
-        if (this.selectedField.type === "gallery") {
+        if (this.selectedField.type === "Gallery") {
           this.itemTitle = this.selectedField.fields.list[index].title;
           this.itemThumbnail = this.selectedField.fields.list[index].thumbnail;
           this.itemSrc = this.selectedField.fields.list[index].src;
           this.itemIndex = this.selectedField.fields.list[index].index;
-        } else if (this.selectedField.type === "form-contact") {
+        } else if (this.selectedField.type === "Form Contact") {
           this.form = Object.assign({}, this.selectedField.fields.list[index]);
           console.log("output-value-edit-" + index);
           console.log(this.form);
@@ -662,7 +711,7 @@ export default {
             this.form.width + " %";
           document.getElementById("edit-width-" + index).value =
             this.form.width;
-        } else if (this.selectedField.type === "swiper-slider") {
+        } else if (this.selectedField.type === "Swiper Slider") {
           this.itemTitle = this.selectedField.fields.list[index].title;
           this.itemContent = this.selectedField.fields.list[index].content;
           this.itemImg = this.selectedField.fields.list[index].img;
@@ -673,10 +722,11 @@ export default {
     },
     selectField(item, index) {
       this.selectedField = item;
+      this.keyOptions = Object.keys(item.options);
       this.closeAdd();
       this.closeItemDetail();
       this.selectedFieldIndex = index;
-      this.options = this.selectedField.fields.options;
+      this.options = Object.assign({}, this.selectedField.options);
       this.tab = "navigator";
     },
     addItem() {
@@ -720,7 +770,7 @@ export default {
     },
     addNewItem() {
       let data = {};
-      if (this.selectedField.type === "form-contact") {
+      if (this.selectedField.type === "Form Contact") {
         this.form.type = this.createType;
         this.form.width = document.getElementById("form-width").value;
         if (this.createType === "Checkbox" || this.createType === "Radio") {
@@ -729,14 +779,14 @@ export default {
           this.form.value = "";
         }
         data = this.form;
-      } else if (this.selectedField.type === "gallery") {
+      } else if (this.selectedField.type === "Gallery") {
         data = {
           title: this.itemTitle,
           index: this.itemIndex,
           thumbnail: this.itemThumbnail,
           src: this.itemSrc,
         };
-      } else if (this.selectedField.type === "swiper-slider") {
+      } else if (this.selectedField.type === "Swiper Slider") {
         data = {
           title: this.itemTitle,
           img: this.itemImg,
@@ -751,7 +801,7 @@ export default {
     },
     changeItemContent(index) {
       let data = {};
-      if (this.selectedField.type === "gallery") {
+      if (this.selectedField.type === "Gallery") {
         data = {
           index: this.selectedFieldIndex,
           itemIndex: index,
@@ -762,14 +812,14 @@ export default {
             index: this.itemIndex,
           },
         };
-      } else if (this.selectedField.type === "form-contact") {
+      } else if (this.selectedField.type === "Form Contact") {
         data = {
           index: this.selectedFieldIndex,
           itemIndex: index,
           data: this.form,
           width: document.getElementById("edit-width-" + index).value,
         };
-      } else if (this.selectedField.type === "swiper-slider") {
+      } else if (this.selectedField.type === "Swiper Slider") {
         data = {
           index: this.selectedFieldIndex,
           itemIndex: index,
@@ -810,13 +860,15 @@ export default {
       });
     },
     applyConfig() {
-      if (this.selectedField.type === "gallery") {
+      console.log(this.selectedField.options);
+      if (this.selectedField.type === "Gallery") {
         if (this.options.columns < 1) {
           alert("The columns field must be >= 1!");
         } else if (this.options.columnGap < 0 || this.options.rowGap < 0) {
           alert("The gap values must be >= 0!");
         } else {
           this.$store.commit("setComponentFormItemOptions", {
+            sectionIndex: this.sectionIndex,
             index: this.selectedFieldIndex,
             options: {
               columns: this.options.columns,
@@ -825,7 +877,7 @@ export default {
             },
           });
         }
-      } else if (this.selectedField.type === "swiper-slider") {
+      } else if (this.selectedField.type === "Swiper Slider") {
         if (
           this.options.itemsPerPage < 1 ||
           this.options.itemPerPage > this.selectedField.fields.list.length
@@ -836,6 +888,7 @@ export default {
           );
         } else {
           this.$store.commit("setComponentFormItemOptions", {
+            sectionIndex: this.sectionIndex,
             index: this.selectedFieldIndex,
             options: {
               itemsPerPage: this.options.itemsPerPage,
@@ -850,20 +903,39 @@ export default {
       this.$store.commit("deleteComponentFormItem", index);
     },
     resetConfig() {
-      if (this.selectedField.type === "gallery") {
+      if (this.selectedField.type === "Gallery") {
         this.options = {
           columns: 4,
           rowGap: 50,
           columnGap: 50,
         };
-      } else if (this.selectedField.type === "swiper-slider") {
+      } else if (this.selectedField.type === "Swiper Slider") {
         this.options = {
           itemsPerPage: 3,
           pagination: true,
           navigation: true,
         };
+      } else {
+        this.options = {};
       }
       this.applyConfig();
+    },
+    showSection() {
+      let treeList = document
+        .getElementById("navigator-item")
+        .querySelectorAll("#tree-0");
+      treeList.forEach((item) => {
+        item.classList.toggle("active");
+      });
+    },
+    selectChildren(e) {
+      this.selectedField = e;
+      this.selectedFieldIndex = e.index - 1;
+      this.keyOptions = Object.keys(e.options);
+      this.options = Object.assign({}, e.options);
+      setTimeout(() => {
+        this.setTab("content");
+      }, 100);
     },
   },
 };
