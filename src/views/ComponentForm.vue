@@ -24,7 +24,7 @@
             </li>
           </ul>
         </div>
-        <div class="item-content-elements" v-show="tab === 'elements'">
+        <div class="item-content-elements" v-if="tab === 'elements'">
           <div class="button" id="gallery" draggable="true" @dragstart="drag">
             Gallery
           </div>
@@ -54,7 +54,7 @@
             Image Upload
           </div>
         </div>
-        <div v-show="tab === 'content'" class="item-content-content">
+        <div v-if="tab === 'content'" class="item-content-content">
           <div class="options" v-if="keyOptions.length > 0">
             <h4>Options</h4>
             <div class="option-list">
@@ -122,7 +122,7 @@
               </div>
               <div class="actions">
                 <button @click="applyConfig">Apply</button>
-                <button @click="resetConfig">Reset</button>
+                <button @click="resetConfig" v-if="selectedField.type === 'Gallery' || selectedField.type === 'Swiper Slider'">Reset</button>
               </div>
             </div>
           </div>
@@ -427,21 +427,22 @@
             </ul>
           </div>
         </div>
-        <div v-show="tab === 'navigator'" class="item-content-navigator">
+        <div v-if="tab === 'navigator'" class="item-content-navigator">
           <div class="navigator-action">
-            <button>Add section</button>
+            <button @click="addSection">Add section</button>
           </div>
           <div
             v-for="(item, index) in sortComponentForm"
             :key="index"
             class="navigator-item"
-            id="navigator-item"
+            :id="'navigator-item-' + index"
           >
-            <div class="title" @click="showSection">
+            <div class="title" @click="showSection(index)">
               Section {{ index + 1 }}
             </div>
             <tree-view
               :items="item.section.items"
+              :sectionIndex="index"
               @select-children="selectChildren"
               deep="0"
             />
@@ -449,11 +450,13 @@
         </div>
       </div>
     </div>
-    <div class="right" id="div" @drop.prevent="drop" @dragover.prevent>
+    <div class="right" id="div">
       <div
         v-for="(item, index) in sortComponentForm"
         :key="index"
         class="form-component"
+        @click="selectSection(index)"
+        @drop.prevent="drop($event, index)" @dragover.prevent
       >
         <span
           @click.stop="deleteComponent(index)"
@@ -463,14 +466,14 @@
           >x</span
         >
         <div
-          v-if="sortComponentForm[sectionIndex].section.items.length === 0"
+          v-if="sortComponentForm[index].section.items.length === 0"
           class="no-data"
         >
           Select elements to create your page
         </div>
         <div v-else>
           <div
-            v-for="(field, i) in sortComponentForm[sectionIndex].section.items"
+            v-for="(field, i) in sortComponentForm[index].section.items"
             :key="i"
             class="component-item"
             @click="selectField(field, i)"
@@ -589,11 +592,11 @@ export default {
     drag(e) {
       e.dataTransfer.setData("id", e.target.id);
     },
-    drop(e) {
+    drop(e, index) {
       let id = e.dataTransfer.getData("id");
       if (id === "gallery") {
         this.$store.commit("addComponentFormItem", {
-          sectionIndex: this.sectionIndex,
+          sectionIndex: index,
           data: {
             children: GalleryData,
             options: {
@@ -607,7 +610,7 @@ export default {
         });
       } else if (id === "contact-form") {
         this.$store.commit("addComponentFormItem", {
-          sectionIndex: this.sectionIndex,
+          sectionIndex: index,
           data: {
             children: FormContactData,
             options: {},
@@ -617,7 +620,7 @@ export default {
         });
       } else if (id === "slider") {
         this.$store.commit("addComponentFormItem", {
-          sectionIndex: this.sectionIndex,
+          sectionIndex: index,
           data: {
             children: SwiperSliderData,
             options: {
@@ -631,7 +634,7 @@ export default {
         });
       } else if (id === "text") {
         this.$store.commit("addComponentFormItem", {
-          sectionIndex: this.sectionIndex,
+          sectionIndex: index,
           data: {
             children: [],
             fields: {
@@ -651,12 +654,13 @@ export default {
           },
         });
       }
-      this.selectField(
-        this.listComponentForm[this.sectionIndex].section.items[
-          this.listComponentForm[this.sectionIndex].section.items.length - 1
-        ],
-        this.listComponentForm[this.sectionIndex].section.items.length - 1
-      );
+      // this.selectField(
+      //   this.listComponentForm[this.sectionIndex].section.items[
+      //     this.listComponentForm[this.sectionIndex].section.items.length - 1
+      //   ],
+      //   this.listComponentForm[this.sectionIndex].section.items.length - 1
+      // );
+      console.log('ax', this.listComponentForm);
     },
     openFormAdd() {
       this.closeItemDetail();
@@ -722,7 +726,7 @@ export default {
     },
     selectField(item, index) {
       this.selectedField = item;
-      this.keyOptions = Object.keys(item.options);
+      this.keyOptions = item.options ? Object.keys(item.options) : [];
       this.closeAdd();
       this.closeItemDetail();
       this.selectedFieldIndex = index;
@@ -803,7 +807,7 @@ export default {
       let data = {};
       if (this.selectedField.type === "Gallery") {
         data = {
-          index: this.selectedFieldIndex,
+          index: this.sectionIndex,
           itemIndex: index,
           data: {
             title: this.itemTitle,
@@ -814,14 +818,14 @@ export default {
         };
       } else if (this.selectedField.type === "Form Contact") {
         data = {
-          index: this.selectedFieldIndex,
+          index: this.sectionIndex,
           itemIndex: index,
           data: this.form,
           width: document.getElementById("edit-width-" + index).value,
         };
       } else if (this.selectedField.type === "Swiper Slider") {
         data = {
-          index: this.selectedFieldIndex,
+          index: this.sectionIndex,
           itemIndex: index,
           data: {
             title: this.itemTitle,
@@ -897,10 +901,24 @@ export default {
             },
           });
         }
+      } else if(this.selectedField.type === "Image") {
+        let data = {
+          index: this.sectionIndex,
+          itemIndex: this.selectedFieldIndex,
+          data: {
+            title: this.options.title,
+            thumbnail: this.options.thumbnail,
+            src: this.options.src,
+            index: this.options.index,
+          },
+        };
+        this.$store.commit("changeListItemComponentForm", data);
+        this.selected = null;
+        this.closeItemDetail();
       }
     },
     deleteComponent(index) {
-      this.$store.commit("deleteComponentFormItem", index);
+      this.$store.commit("deleteComponentFormSection", index);
     },
     resetConfig() {
       if (this.selectedField.type === "Gallery") {
@@ -920,10 +938,13 @@ export default {
       }
       this.applyConfig();
     },
-    showSection() {
+    showSection(i) {
+      this.selectSection(i);
+      console.log(this.listComponentForm);
       let treeList = document
-        .getElementById("navigator-item")
-        .querySelectorAll("#tree-0");
+        .getElementById("navigator-item-" + i)
+        .querySelectorAll("#tree-" + i + "-0");
+      console.log(treeList);
       treeList.forEach((item) => {
         item.classList.toggle("active");
       });
@@ -933,9 +954,32 @@ export default {
       this.selectedFieldIndex = e.index - 1;
       this.keyOptions = Object.keys(e.options);
       this.options = Object.assign({}, e.options);
+      this.keyOptions.forEach((key, index) => {
+        if (key === "value" || key === "listSelected") {
+          this.keyOptions.splice(index, 1);
+        }
+      })
       setTimeout(() => {
         this.setTab("content");
       }, 100);
+    },
+    selectSection(i) {
+      this.options = {};
+      this.sectionIndex = i;
+    },
+    addSection() {
+      this.$store.commit("addComponentFormSection", {
+        section: {
+          items: [],
+        },
+      });
+      console.log(this.listComponentForm)
+    },
+    deleteComponentItem(i) {
+      this.$store.commit("deleteComponentFormItem", {
+        sectionIndex: this.sectionIndex,
+        index: i,
+      });
     },
   },
 };
