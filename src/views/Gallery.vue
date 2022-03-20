@@ -51,7 +51,7 @@
             :class="selected === index ? 'active' : ''"
             :key="index">
             <div class="title" @click="select(index)">
-              {{ item.options.title }}
+              {{ item.liquidData.title }}
             </div>
             <div class="item-content" v-if="selected === index">
               <div>
@@ -75,8 +75,8 @@
                 <input id="edit-src" type="text" v-model="itemSrc" />
               </div>
               <div class="item-actions">
-                <button @click="changeItemContent(index)">Apply</button>
-                <button @click="deleteItem(index)">Delete</button>
+                <button @click="changeItemContent(item.liquidData.index)">Apply</button>
+                <button @click="deleteItem(item.liquidData.index)">Delete</button>
                 <button @click="closeItemDetail()">Cancel</button>
               </div>
             </div>
@@ -104,7 +104,7 @@
         :key="index"
         @click="openImage(item)"
       >
-        <img :src="item.options.thumbnail" alt="" />
+        <img :src="item.liquidData.thumbnail" alt="" />
       </div>
     </div>
     <LightBox
@@ -142,7 +142,7 @@ export default {
       let newArrays = Object.assign([], this.listGallery);
       for (let i = 0; i < newArrays.length - 1; i++) {
         for (let j = i + 1; j < newArrays.length; j++) {
-          if (newArrays[i].index > newArrays[j].index) {
+          if (newArrays[i].liquidData.index > newArrays[j].liquidData.index) {
             let temp = newArrays[i];
             newArrays[i] = newArrays[j];
             newArrays[j] = temp;
@@ -168,10 +168,10 @@ export default {
       if (this.selected !== index) {
         this.cancelAdd();
         this.selected = index;
-        this.itemTitle = this.sortItems[index].options.title;
-        this.itemThumbnail = this.sortItems[index].options.thumbnail;
-        this.itemSrc = this.sortItems[index].options.src;
-        this.itemIndex = this.sortItems[index].index;
+        this.itemTitle = this.sortItems[index].liquidData.title;
+        this.itemThumbnail = this.sortItems[index].liquidData.thumbnail;
+        this.itemSrc = this.sortItems[index].liquidData.src;
+        this.itemIndex = this.sortItems[index].liquidData.index + 1;
       } else {
         this.closeItemDetail();
       }
@@ -199,12 +199,11 @@ export default {
       if (this.itemIndex >= 1 && this.itemIndex <= this.listGallery.length) {
         this.$store.commit("changeGalleryItemContent", {
           index: index,
-          itemIndex: this.itemIndex,
           gallery: {
             title: this.itemTitle,
             thumbnail: this.itemThumbnail,
             src: this.itemSrc,
-            index: this.itemIndex,
+            index: this.itemIndex - 1,
           },
         });
         this.closeItemDetail();
@@ -229,14 +228,13 @@ export default {
     },
     addNewItem() {
       this.$store.commit("addGalleryItem", {
-        children: [],
-        options: {
+        liquidData: {
           src: this.itemSrc,
           title: this.itemTitle,
           thumbnail: this.itemThumbnail,
+          index: this.listGallery.length + 1,
         },
-        type: "Image",
-        index: this.listGallery.length + 1,
+        type: "Image Gallery",
       });
       this.cancelAdd();
     },

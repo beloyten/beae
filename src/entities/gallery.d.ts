@@ -1,11 +1,11 @@
-import { Field } from "./field";
+import { GalleryImage } from "./galleryImage";
 
 export interface Gallery {
-  children?: Array<Field>;
-  options: {
-    src: string;
-    title: string;
-    thumbnail: string;
+  items: Array<GalleryImage>;
+  liquidData: {
+    columns: number;
+    rowGap: number;
+    columnGap: number;
   };
   type: string;
   index: number;

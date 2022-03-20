@@ -62,7 +62,7 @@
             :key="index"
           >
             <div class="title" @click="select(index)">
-              {{ item.options.title }}
+              {{ item.items[1].liquidData.content }}
             </div>
             <div class="item-content" v-if="selected === index">
               <div>
@@ -79,7 +79,7 @@
               </div>
               <div class="item-actions">
                 <button @click="changeItemContent(index)">Apply</button>
-                <button @click="deleteItem(index)">Delete</button>
+                <button @click="deleteItem(item.index)">Delete</button>
                 <button @click="closeItemDetail()">Cancel</button>
               </div>
             </div>
@@ -116,15 +116,15 @@
           <div class="slider-item">
             <img
               :src="
-                item.options.img
-                  ? item.options.img
+                item.items[0].liquidData.src
+                  ? item.items[0].liquidData.src
                   : 'https://swiperjs.com/demos/images/nature-9.jpg'
               "
               alt=""
             />
             <div class="content">
-              <h3>{{ item.options.title }}</h3>
-              <p>{{ item.options.content }}</p>
+              <h3>{{ item.items[1].liquidData.content }}</h3>
+              <p>{{ item.items[2].liquidData.content }}</p>
             </div>
           </div>
         </swiper-slide>
@@ -196,13 +196,30 @@ export default {
     },
     addNewItem() {
       this.$store.commit("addNewSwiperSlider", {
-        children: [],
-        options: {
-          img: this.itemImg,
-          title: this.itemTitle,
-          content: this.itemContent,
-        },
-        type: "Slider",
+        items: [
+          {
+            liquidData: {
+              src: this.itemImg,
+            },
+            type: "Image",
+            index: 0,
+          },
+          {
+            liquidData: {
+              content: this.itemTitle,
+            },
+            type: "Heading",
+            index: 1,
+          },
+          {
+            liquidData: {
+              content: this.itemContent,
+            },
+            type: "Text",
+            index: 2,
+          },
+        ],
+        type: "Slider Item",
         index: this.slides.length + 1,
       });
       this.cancelAdd();
@@ -215,9 +232,9 @@ export default {
       if (this.selected !== index) {
         this.cancelAdd();
         this.selected = index;
-        this.itemTitle = this.slides[index].options.title;
-        this.itemContent = this.slides[index].options.content;
-        this.itemImg = this.slides[index].options.img;
+        this.itemTitle = this.slides[index].items[1].liquidData.content;
+        this.itemContent = this.slides[index].items[2].liquidData.content;
+        this.itemImg = this.slides[index].items[0].liquidData.src;
       } else {
         this.closeItemDetail();
       }
@@ -225,11 +242,9 @@ export default {
     changeItemContent(index) {
       this.$store.commit("changeSwiperSliderItemContent", {
         index: index,
-        item: {
-          title: this.itemTitle,
-          content: this.itemContent,
-          img: this.itemImg,
-        },
+        title: this.itemTitle,
+        content: this.itemContent,
+        img: this.itemImg,
       });
       this.closeItemDetail();
     },

@@ -8,9 +8,9 @@
           <div class="add-list" :class="showAddList ? 'show' : ''">
             <span @click="cancelAdd()">x</span>
             <ul>
-              <li @click="setCreateType('Text')">Text</li>
-              <li @click="setCreateType('Email')">Email</li>
-              <li @click="setCreateType('Datetime')">Datetime</li>
+              <li @click="setCreateType('Input Text')">Input Text</li>
+              <li @click="setCreateType('Input Email')">Input Email</li>
+              <li @click="setCreateType('Input Datetime')">Input Datetime</li>
               <li @click="setCreateType('Select')">Select</li>
               <li @click="setCreateType('Checkbox')">Checkbox</li>
               <li @click="setCreateType('Radio')">Radio</li>
@@ -27,8 +27,8 @@
             </div>
             <div
               v-if="
-                createType === 'Text' ||
-                createType === 'Email' ||
+                createType === 'Input Text' ||
+                createType === 'Input Email' ||
                 createType === 'Long Text'
               "
             >
@@ -103,22 +103,22 @@
         </div>
         <ul>
           <li
-            v-for="(item, index) in fields"
-            :class="selected === index ? 'active' : ''"
+            v-for="(item, index) in allItems"
+            :class="selected === item.index ? 'active' : ''"
             :key="index"
           >
-            <div class="title" @click="select(index)">
+            <div class="title" @click="select(item.index, index)">
               {{ item.type }}
             </div>
-            <div class="item-content" v-show="selected === index">
-              <div>
+            <div class="item-content" v-show="selected === item.index">
+              <div v-if="item.type !== 'Button'">
                 <label for="edit-label">Label</label>
                 <input id="edit-label" type="text" v-model="formEdit.label" />
               </div>
               <div
                 v-if="
-                  item.type === 'Text' ||
-                  item.type === 'Email' ||
+                  item.type === 'Input Text' ||
+                  item.type === 'Input Email' ||
                   item.type === 'Long Text'
                 "
               >
@@ -129,7 +129,7 @@
                   v-model="formEdit.placeholder"
                 />
               </div>
-              <div>
+              <div v-if="item.type !== 'Button'">
                 <label for="edit-description">Description</label>
                 <textarea
                   id="edit-description"
@@ -137,7 +137,7 @@
                 />
                 <span>Description about the field</span>
               </div>
-              <div class="required">
+              <div class="required" v-if="item.type !== 'Button'">
                 <label for="edit-required">Required</label>
                 <input
                   id="edit-required"
@@ -155,13 +155,13 @@
               >
                 <div class="label">
                   <label>Options</label>
-                  <button @click="addOptions(item)">Add</button>
+                  <button @click="addOptions(formEdit)">Add</button>
                 </div>
                 <div class="options-content">
-                  <div v-for="(i, position) in item.options" :key="position">
+                  <div v-for="(i, position) in formEdit.options" :key="position">
                     <div class="title-option">
                       <h4>Option {{ position + 1 }}</h4>
-                      <button @click="deleteOption(position, item)">
+                      <button @click="deleteOption(position, formEdit)">
                         Delete
                       </button>
                     </div>
@@ -176,6 +176,10 @@
                   </div>
                 </div>
               </div>
+              <div v-if="item.type === 'Button'">
+                <label for="edit-label">Text</label>
+                <input id="edit-label" type="text" v-model="formEdit.text" />
+              </div>
               <div class="field-width">
                 <label for="edit-width">Field width</label>
                 <div class="slider">
@@ -185,14 +189,14 @@
                     max="100"
                     value="50"
                     :id="'edit-width-' + index"
-                    @input="onUpdateWidth"
+                    @input="onUpdateWidth($event, item.index)"
                   />
-                  <output :id="'output-value-edit-' + index">50 %</output>
+                  <output :id="'output-value-edit-' + item.index">50 %</output>
                 </div>
               </div>
               <div class="item-actions">
                 <button @click="changeItemContent(index)">Apply</button>
-                <button @click="deleteItem(index)">Delete</button>
+                <button @click="deleteItem(item.index)" v-if="item.type !== 'Button'">Delete</button>
                 <button @click="closeItemDetail()">Cancel</button>
               </div>
             </div>
@@ -206,82 +210,82 @@
           <div
             class="item"
             :class="item.type"
-            :id="'item-' + index"
+            :id="'item-' + item.index"
             :style="
-              item.options.width > 50
-                ? '--width: ' + item.options.width + '%; --gridColumn: 1/3'
-                : '--width: ' + item.options.width * 2 + '%; --gridColumn: auto'
+              item.liquidData.width > 50
+                ? '--width: ' + item.liquidData.width + '%; --gridColumn: 1/3'
+                : '--width: ' + item.liquidData.width * 2 + '%; --gridColumn: auto'
             "
             v-for="(item, index) in list"
             :key="index"
           >
-            <div v-if="item.type === 'Text' || item.type === 'Email'">
+            <div v-if="item.type === 'Input Text' || item.type === 'Input Email'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label }}
-                <span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label }}
+                <span v-if="item.liquidData.required">*</span></label
               >
               <input
                 :id="'field-item-' + index"
-                :placeholder="item.options.placeholder"
+                :placeholder="item.liquidData.placeholder"
                 :type="item.type.toLowerCase()"
-                :required="item.options.required"
-                v-model="item.options.value"
+                :required="item.liquidData.required"
+                v-model="item.liquidData.value"
               />
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
             <div v-else-if="item.type === 'Long Text'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label }} <span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label }} <span v-if="item.liquidData.required">*</span></label
               >
               <textarea
                 :id="'field-item-' + index"
-                :placeholder="item.options.placeholder"
-                :required="item.options.required"
-                v-model="item.options.value"
+                :placeholder="item.liquidData.placeholder"
+                :required="item.liquidData.required"
+                v-model="item.liquidData.value"
               />
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
-            <div v-else-if="item.type === 'Datetime'">
+            <div v-else-if="item.type === 'Input Datetime'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label
-                }}<span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label
+                }}<span v-if="item.liquidData.required">*</span></label
               >
               <input
                 type="datetime-local"
                 :id="'field-item-' + index"
-                :required="item.options.required"
-                v-model="item.options.value"
+                :required="item.liquidData.required"
+                v-model="item.liquidData.value"
               />
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
             <div v-else-if="item.type === 'Select'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label }}
-                <span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label }}
+                <span v-if="item.liquidData.required">*</span></label
               >
               <select
                 :id="'field-item-' + index"
-                :required="item.options.required"
-                v-model="item.options.value"
+                :required="item.liquidData.required"
+                v-model="item.liquidData.value"
               >
                 <option
-                  v-for="(i, index) in item.options.options"
+                  v-for="(i, index) in item.liquidData.options"
                   :key="index"
                   :value="i.value"
                 >
                   {{ i.text }}
                 </option>
               </select>
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
             <div v-else-if="item.type === 'Checkbox'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label }}
-                <span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label }}
+                <span v-if="item.liquidData.required">*</span></label
               >
               <div
                 class="option"
-                v-for="(i, position) in item.options.options"
+                v-for="(i, position) in item.liquidData.options"
                 :key="position"
               >
                 <input
@@ -294,16 +298,16 @@
                   i.text
                 }}</label>
               </div>
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
             <div v-else-if="item.type === 'Radio'">
               <label :for="'field-item-' + index"
-                >{{ item.options.label }}
-                <span v-if="item.options.required">*</span></label
+                >{{ item.liquidData.label }}
+                <span v-if="item.liquidData.required">*</span></label
               >
               <div
                 class="option"
-                v-for="(i, position) in item.options.options"
+                v-for="(i, position) in item.liquidData.options"
                 :key="position"
               >
                 <input
@@ -311,19 +315,21 @@
                   :id="'radio-' + index + '' + position"
                   :value="i.value"
                   :name="'radio-' + index"
-                  :required="item.options.required"
-                  @change="selectOptions($event, index)"
+                  :required="item.liquidData.required"
+                  v-model="item.liquidData.value"
                 />
                 <label :for="'radio-' + index + '' + position">{{
                   i.text
                 }}</label>
               </div>
-              <span class="description">{{ item.options.description }}</span>
+              <span class="description">{{ item.liquidData.description }}</span>
             </div>
           </div>
         </div>
         <div class="actions">
-          <input type="submit" class="btn" value="Send message" />
+          <div v-for="(item, index) in buttons" :key="index" id="button-submit">
+            <input type="submit" class="btn" :value="item.liquidData.text" />
+          </div>
         </div>
       </form>
     </div>
@@ -339,12 +345,7 @@ export default {
         required: false,
         width: 0,
       },
-      formEdit: {
-        label: "",
-        description: "",
-        required: false,
-        width: 0,
-      },
+      formEdit: {},
       checkAddNew: false,
       selected: null,
       showAddList: false,
@@ -357,17 +358,22 @@ export default {
   },
   computed: {
     fields() {
-      return this.$store.getters.getFormContactList;
+      return this.$store.getters.getFormContactItems;
     },
+    buttons() {
+      return this.$store.getters.getFormContactButtons;
+    },
+    allItems() {
+      return this.fields.concat(this.buttons);
+    }
   },
   methods: {
-    select(index) {
-      console.log(this.fields[index]);
-      if (this.selected !== index) {
+    select(itemIndex, index) {
+      if (this.selected !== itemIndex) {
         this.closeAdd();
-        this.formEdit = Object.assign({}, this.fields[index].options);
-        this.selected = index;
-        document.getElementById("output-value-edit-" + index).innerHTML =
+        this.formEdit = Object.assign({}, this.allItems[index].liquidData);
+        this.selected = itemIndex;
+        document.getElementById("output-value-edit-" + itemIndex).innerHTML =
           this.formEdit.width + " %";
         document.getElementById("edit-width-" + index).value =
           this.formEdit.width;
@@ -389,14 +395,7 @@ export default {
     },
     closeItemDetail() {
       this.selected = null;
-      this.formEdit = {
-        label: "",
-        placeholder: "",
-        fieldName: "",
-        description: "",
-        required: false,
-        width: 0,
-      };
+      this.formEdit = {};
     },
     addItem() {
       this.showAddList = true;
@@ -405,7 +404,7 @@ export default {
       this.showAddList = false;
     },
     setCreateType(string) {
-      if (string === "Text" || string === "Email" || string === "Long Text") {
+      if (string === "Input Text" || string === "Input Email" || string === "Long Text") {
         this.form.placeholder = "";
         if (string === "Long Text") {
           document.getElementById("output-value").innerHTML = "100 %";
@@ -423,6 +422,7 @@ export default {
           },
         ];
       }
+      this.form.type = string;
       this.createType = string;
       this.closeItemDetail();
       this.showAddList = false;
@@ -440,54 +440,67 @@ export default {
     addNewItem() {
       // this.form.type = this.createType;
       this.form.width = document.getElementById("form-width").value;
-      if (this.createType === "Checkbox" || this.createType === "Radio") {
+      if (this.createType === "Checkbox") {
         this.form.listSelected = [];
       } else {
         this.form.value = "";
       }
+      this.form.index = this.allItems.length + 1;
       this.$store.commit("addFormContactItem", {
-        children: [],
-        options: this.form,
+        liquidData: this.form,
         type: this.createType,
-        index: this.fields.length + 1,
+        index: this.allItems.length + 1,
       });
-      this.list.push(this.fields[this.fields.length - 1]);
+      this.list.push({
+        liquidData: this.form,
+        type: this.createType,
+        index: this.allItems.length + 1,
+      });
       this.closeAdd();
     },
     changeItemContent(index) {
-      this.$store.commit("changeFormContactItemContent", {
-        index: index,
+      this.formEdit.width = document.getElementById("edit-width-" + index).value;
+      this.$store.commit("changeFormContactItem", {
+        index: this.allItems[index].type === "Button" ? 0 : index,
+        type: this.allItems[index].type,
         formEdit: this.formEdit,
-        width: document.getElementById("edit-width-" + index).value,
       });
-      this.list[index] = this.fields[index];
+      if (this.allItems[index].type !== "Button") {
+        this.list[index] = Object.assign({}, this.fields[index]);
+      }
+      console.log(this.list);
       this.closeItemDetail();
     },
     deleteItem(index) {
       this.$store.commit("deleteFormContactItem", index);
-      this.list.splice(index, 1);
+      this.list = Object.assign([], this.fields);
+      this.closeItemDetail();
     },
-    onUpdateWidth(e) {
+    onUpdateWidth(e, index) {
       let width = e.target.value;
-      let element = document.getElementById("item-" + this.selected).style;
       document.getElementById("output-value-edit-" + this.selected).innerHTML =
         width + "%";
-      if (width > 50) {
-        element.gridColumn = "1/3";
-        element.width = width + "%";
+      if (this.allItems[index].type !== "Button") {
+        let element = document.getElementById("item-" + this.selected).style;
+        if (width > 50) {
+          element.gridColumn = "1/3";
+          element.width = width + "%";
+        } else {
+          element.gridColumn = "auto";
+          element.width = width * 2 + "%";
+        }
       } else {
-        element.gridColumn = "auto";
-        element.width = width * 2 + "%";
+        document.getElementById("button-submit").style.width = width + "%";
       }
     },
     onSubmit(e) {
       e.preventDefault();
       let check = true;
-      this.fields.forEach((item) => {
-        if (item.type === "Checkbox" && item.required) {
+      this.list.forEach((item) => {
+        if (item.type === "Checkbox" && item.liquidData.required) {
           if (
-            !item.listSelected ||
-            (item.listSelected && item.listSelected.length === 0)
+            !item.liquidData.listSelected ||
+            (item.liquidData.listSelected && item.liquidData.listSelected.length === 0)
           ) {
             check = false;
             alert("Please input required Checkbox!");
@@ -500,20 +513,34 @@ export default {
       }
     },
     selectOptions(e, index) {
-      this.$store.commit("selecOptionFormContact", {
-        index: index,
-        value: e.target.value,
-      });
-      this.list[index] = this.fields[index];
+      let value = e.target.value;
+      if (!this.list[index].liquidData.listSelected) {
+        this.list[index].liquidData.listSelected = [];
+        this.list[index].liquidData.listSelected.push(value);
+      } else {
+        let i = -1;
+        this.list[index].liquidData.listSelected.forEach(
+          (item, position) => {
+            if (item === value) {
+              i = position;
+            }
+          }
+        );
+        if (i !== -1) {
+          this.list[index].liquidData.listSelected.splice(i, 1);
+        } else {
+          this.list[index].liquidData.listSelected.push(value);
+        }
+      }
     },
     showSuccessMsg() {
       let message = "Submit successful!\n";
-      this.fields.forEach((item) => {
-        if (item.type === "Checkbox" || item.type === "Radio") {
+      this.list.forEach((item) => {
+        if (item.type === "Checkbox") {
           message +=
-            item.label + ": " + this.arrayToString(item.listSelected) + "\n";
+            item.liquidData.label + ": " + this.arrayToString(item.liquidData.listSelected) + "\n";
         } else {
-          message += item.label + ": " + item.value + "\n";
+          message += item.liquidData.label + ": " + item.liquidData.value + "\n";
         }
       });
       alert(message);

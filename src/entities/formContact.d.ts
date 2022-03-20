@@ -1,18 +1,10 @@
-import { Option } from "./option";
-import { Field } from "./field";
+
+import { FormItem } from "./formItem";
+import { Button } from "./button";
 
 export interface FormContact {
-  children?: Array<Field>;
-  options: {
-    label: string;
-    placeholder?: string;
-    description: string;
-    required: boolean;
-    width: number;
-    value?: string;
-    options?: Array<Option>;
-    listSelected?: Array<string>;
-  };
+  items: Array<FormItem>;
+  buttons: Array<Button>;
   type: string;
   index: number;
 }

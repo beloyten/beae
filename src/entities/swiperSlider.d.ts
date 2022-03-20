@@ -1,11 +1,11 @@
 import { Field } from "./field";
 
 export interface SwiperSlider {
-  children?: Array<Field>;
-  options: {
-    img: string;
-    title: string;
-    content: string;
+  items: Array<SliderItem>;
+  liquidData: {
+    itemsPerPage: number;
+    pagination: boolean;
+    navigation: boolean;
   };
   type: string;
   index: number;
